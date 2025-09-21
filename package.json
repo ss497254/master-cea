@@ -1,0 +1,56 @@
+{
+  "name": "master-cea",
+  "version": "1.0.0",
+  "description": "AI Bot using Microsoft 365 Agent SDK",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "bun esbuild.config.js",
+    "build:watch": "bun esbuild.config.js --watch",
+    "build:prod": "NODE_ENV=production && bun esbuild.config.js",
+    "start": "bun dist/index.js",
+    "dev": "nodemon",
+    "clean": "rimraf dist",
+    "tunnel": "bun ./scripts/devtunnel.js",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "format:staged": "prettier --write",
+    "lint": "eslint src/**/*.ts",
+    "lint:fix": "eslint src/**/*.ts --fix",
+    "check": "bun run format:check && bun run lint"
+  },
+  "keywords": [
+    "microsoft365",
+    "ai",
+    "bot",
+    "agent",
+    "m365"
+  ],
+  "author": "Saurabh Singh",
+  "dependencies": {
+    "@azure/identity": "^4.12.0",
+    "@azure/keyvault-secrets": "^4.10.0",
+    "@azure/msal-node": "^2.6.6",
+    "@azure/openai": "^2.0.0",
+    "@microsoft/agents-activity": "^1.0.14",
+    "@microsoft/agents-hosting": "^1.0.14",
+    "@microsoft/agents-hosting-express": "^1.0.14",
+    "express": "^5.1.0",
+    "reflect-metadata": "^0.2.2",
+    "tsyringe": "^4.10.0"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.3",
+    "@types/node": "^20.11.19",
+    "@typescript-eslint/eslint-plugin": "^8.42.0",
+    "@typescript-eslint/parser": "^8.42.0",
+    "dotenv": "^17.2.2",
+    "esbuild": "^0.25.9",
+    "eslint": "^9.35.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.4",
+    "nodemon": "^3.1.10",
+    "prettier": "^3.6.2",
+    "rimraf": "^5.0.5",
+    "typescript": "^5.3.3"
+  }
+}
