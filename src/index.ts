@@ -22,7 +22,7 @@ async function startApplication(): Promise<void> {
     app.listen(config.getPort(), () => {
       logger.info(`🌐 Server listening on port ${config.getPort()}`);
     });
-    logger.info('Starting MasterCEA');
+    logger.info('Starting MasterCEA in '+ process.env.NODE_ENV);
 
     // The server is already listening since startServer handles that
     logger.info('MasterCEA started successfully', {

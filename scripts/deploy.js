@@ -90,7 +90,7 @@ class DeploymentManager {
       console.log('');
       console.log('💡 Next steps:');
       console.log('   1. Review and update the .env file with your configuration');
-      console.log('   2. Build your project: bun run build');
+      console.log('   2. Build your project: bun run build:prod');
       console.log('   3. Deploy: master-cea deploy');
 
     } catch (error) {
@@ -326,7 +326,7 @@ ${envContent}`;
   // Copy dist files to deployment directory
   async copyDistFiles(deploymentPath) {
     if (!fs.existsSync(this.distDir)) {
-      throw new Error('dist directory not found. Run "bun run build" first.');
+      throw new Error('dist directory not found. Run "bun run build:prod" first.');
     }
 
     console.log(`📂 Copying dist files to ${deploymentPath}...`);

@@ -9,10 +9,7 @@ const buildOptions = {
   sourcemap: true,
   external: ['fsevents'],
   format: 'cjs',
-  minify: process.env.NODE_ENV === 'production',
-  define: {
-    'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development'),
-  },
+  minify: process.env.NODE_ENV === 'production'
 };
 
 async function buildApp() {

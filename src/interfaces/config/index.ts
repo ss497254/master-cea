@@ -25,4 +25,4 @@ export interface IAppConfig {
 }
 
 // Configuration loader interface
-export { IConfigLoader } from './configLoader';
+export { IConfigLoader } from './config-loader';

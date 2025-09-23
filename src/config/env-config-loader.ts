@@ -67,6 +67,6 @@ export class EnvironmentConfigLoader extends IConfigLoader {
   }
 
   private getPort(): number {
-    return parseInt(process.env.PORT || '3978', 10);
+    return parseInt(process.env.PORT || '8080', 10);
   }
 }
