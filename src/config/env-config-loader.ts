@@ -6,7 +6,10 @@ import { ILogger } from '../interfaces/services/logger';
 export class EnvironmentConfigLoader extends IConfigLoader {
   constructor(private logger: ILogger) {
     super();
-    dotenv.config(); // Load .env file if present
+    if (process.env.NODE_ENV !== 'production') {
+      dotenv.config(); // Load .env file in non-production environments
+      this.logger.debug('Environment variables loaded by dotenv');
+    }
   }
 
   public getSource(): string {
