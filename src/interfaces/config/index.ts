@@ -13,15 +13,19 @@ export interface IAzureOpenAIConfig {
   temperature: number;
 }
 
+export interface ILoggingConfig {
+  level: 'debug' | 'info' | 'warn' | 'error';
+  enableConsole: boolean;
+  enableFileLogging?: boolean;
+}
+
 export interface IAppConfig {
   bot: AuthConfiguration;
   azureOpenAI: IAzureOpenAIConfig;
+  logging: ILoggingConfig;
   environment: 'development' | 'production' | 'staging';
   port: number;
-  logging: {
-    level: 'debug' | 'info' | 'warn' | 'error';
-    enableConsole: boolean;
-  };
+  assetsPath?: string;
 }
 
 // Configuration loader interface

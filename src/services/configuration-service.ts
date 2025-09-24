@@ -67,4 +67,8 @@ export class ConfigurationService {
   public isConsoleLoggingEnabled(): boolean {
     return this.config.logging.enableConsole;
   }
+
+  public getAssetsPath(): string {
+    return this.config.assetsPath || 'public';
+  }
 }
