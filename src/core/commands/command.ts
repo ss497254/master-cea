@@ -12,7 +12,7 @@ export abstract class Command {
     this.args = args;
   }
 
-  /** permission and validations check */
+  /** permission check */
   abstract canExecute(request: CommandRequest): boolean | Promise<boolean>;
   /** Command logic (must be implemented) */
   abstract execute(request: CommandRequest, context: TurnContext): Promise<void>;
