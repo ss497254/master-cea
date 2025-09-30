@@ -41,7 +41,7 @@ export class MessageProcessorService {
 
     this.handlers = {
       echo: new EchoHandler(),
-      demo: new DemoHandler(),
+      demo: new DemoHandler(config.getBotConfig(), this.logger),
       ai: new AIHandler(config.getAzureOpenAIConfig(), this.logger),
     };
 
