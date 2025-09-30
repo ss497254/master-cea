@@ -22,7 +22,6 @@ export interface ILoggingConfig {
 export interface ICommandConfig {
   enableCommands: boolean;
   prefix: string;
-  allowedUsers?: string[];
 }
 
 export interface IAppConfig {
