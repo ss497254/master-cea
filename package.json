@@ -9,6 +9,7 @@
     "build:prod": "NODE_ENV=production && bun esbuild.config.js",
     "start": "bun dist/index.js",
     "dev": "nodemon",
+    "debug": "bun --inspect=localhost:9229 src/index.ts",
     "clean": "rimraf dist",
     "deploy": "bun run build:prod && cd ./dist && master-cea deploy && cd ..",
     "format": "prettier --write .",
