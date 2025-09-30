@@ -1,22 +1,21 @@
-import { ActivityHandler } from '@microsoft/agents-hosting'
-// import { TeamsActivityHandler } from '@microsoft/agents-hosting-extensions-teams'
+import { ActivityHandler } from '@microsoft/agents-hosting';
 
 export class EchoHandler extends ActivityHandler {
-  constructor () {
-    super()
+  constructor() {
+    super();
     this.onMembersAdded(async (context, next) => {
-      const membersAdded = context.activity.membersAdded
+      const membersAdded = context.activity.membersAdded;
       for (const member of membersAdded!) {
         if (member.id !== context.activity.recipient!.id) {
-          await context.sendActivity('Welcome to the Teams bot!')
+          await context.sendActivity('Welcome to the Teams bot!');
         }
       }
-      await next()
-    })
+      await next();
+    });
 
     this.onMessage(async (context, next) => {
-      await context.sendActivity(`You said: ${context.activity.text}`)
-      await next()
-    })
+      await context.sendActivity(`You said: ${context.activity.text}`);
+      await next();
+    });
   }
 }
