@@ -1,7 +1,7 @@
 import { AuthConfiguration } from '@microsoft/agents-hosting';
-import { ConfigValidator, EnvironmentConfigLoader } from '../config';
-import { IAppConfig, IAzureOpenAIConfig } from '../interfaces/config';
-import { ILogger } from '../interfaces/services/logger';
+import { ConfigValidator, EnvironmentConfigLoader } from '../../config';
+import { IAppConfig, IAzureOpenAIConfig } from '../../interfaces/config';
+import { ILogger } from '../../interfaces/services/logger';
 
 export class ConfigurationService {
   private _config?: IAppConfig;
@@ -42,6 +42,10 @@ export class ConfigurationService {
 
   public getAzureOpenAIConfig(): IAzureOpenAIConfig {
     return this.config.azureOpenAI;
+  }
+
+  public getCommandConfig() {
+    return this.config.commands;
   }
 
   public isConfigLoaded(): boolean {

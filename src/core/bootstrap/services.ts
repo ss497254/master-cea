@@ -1,5 +1,5 @@
 import { container } from 'tsyringe';
-import { ConfigurationService, LoggerService } from '..';
+import { ConfigurationService, LoggerService } from '../services';
 
 export function registerServices() {
   const logger = new LoggerService();
