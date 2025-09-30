@@ -76,7 +76,7 @@ class DeploymentManager {
           previousDeployment: null,
           currentDeployment: null,
           setupTimestamp: new Date().toISOString(),
-          projectRoot: this.projectRoot
+          projectRoot: this.projectRoot,
         };
         this.saveDeploymentMetadata(initialMetadata);
         console.log(`✅ Created deployment metadata file`);
@@ -92,7 +92,6 @@ class DeploymentManager {
       console.log('   1. Review and update the .env file with your configuration');
       console.log('   2. Build your project: bun run build:prod');
       console.log('   3. Deploy: master-cea deploy');
-
     } catch (error) {
       console.error(`❌ Setup failed: ${error.message}`);
       throw error;
@@ -111,12 +110,12 @@ class DeploymentManager {
         return;
       }
 
-      let envContent = "";
+      let envContent = '';
 
       // Check if .env.example exists in project
       if (!fs.existsSync(envExamplePath)) {
         console.log(`⚠️  No .env.example found in project root, creating basic .env template`);
-        
+
         // Create a basic .env template
         envContent = `\
 # Server Configuration
@@ -137,7 +136,6 @@ ${envContent}`;
 
       fs.writeFileSync(envPath, productionEnvContent);
       console.log(`✅ Created .env file`);
-
     } catch (error) {
       console.error(`❌ Failed to setup environment file: ${error.message}`);
       throw error;
@@ -152,7 +150,7 @@ ${envContent}`;
 
     // If script is run directly from project, use current directory
     let currentDir = process.cwd();
-    
+
     // Check if current directory has package.json and dist folder (or can build)
     if (this.isValidProjectDirectory(currentDir)) {
       return currentDir;
@@ -162,7 +160,7 @@ ${envContent}`;
     const scriptPath = fs.realpathSync(__filename);
     const scriptDir = path.dirname(scriptPath);
     const possibleProjectRoot = path.resolve(scriptDir, '..');
-    
+
     if (this.isValidProjectDirectory(possibleProjectRoot)) {
       return possibleProjectRoot;
     }
@@ -179,10 +177,8 @@ ${envContent}`;
     const packageJsonPath = path.join(dir, 'package.json');
     const distPath = path.join(dir, 'dist');
     const srcPath = path.join(dir, 'src');
-    
-    return fs.existsSync(packageJsonPath) && (
-      fs.existsSync(distPath) || fs.existsSync(srcPath)
-    );
+
+    return fs.existsSync(packageJsonPath) && (fs.existsSync(distPath) || fs.existsSync(srcPath));
   }
 
   // Get deployment metadata
@@ -211,7 +207,7 @@ ${envContent}`;
   // Get next deployment name
   getNextDeploymentName() {
     const metadata = this.getDeploymentMetadata();
-    const currentVersion = metadata.currentDeployment ? parseInt(metadata.currentDeployment.substring(1) ?? "0") : 0;
+    const currentVersion = metadata.currentDeployment ? parseInt(metadata.currentDeployment.substring(1) ?? '0') : 0;
     return `v${currentVersion + 1}`;
   }
 
@@ -245,13 +241,13 @@ ${envContent}`;
 
     try {
       console.log(`🛑 Stopping server (PID: ${pid})...`);
-      
+
       // Try graceful shutdown first
       process.kill(pid, 'SIGTERM');
-      
+
       // Wait a bit for graceful shutdown
       await new Promise(resolve => setTimeout(resolve, 3000));
-      
+
       // Check if still running
       const stillRunning = await this.isServerRunning();
       if (stillRunning) {
@@ -276,7 +272,7 @@ ${envContent}`;
   // Start server
   async startServer(deploymentPath) {
     const serverPath = path.join(deploymentPath, 'index.js');
-    
+
     if (!fs.existsSync(serverPath)) {
       throw new Error(`Server file not found: ${serverPath}`);
     }
@@ -287,18 +283,18 @@ ${envContent}`;
       const serverProcess = spawn('bun', [`--env-file=${this.deploymentsDir}/.env`, serverPath], {
         detached: true,
         stdio: ['ignore', 'pipe', 'pipe'],
-        cwd: deploymentPath
+        cwd: deploymentPath,
       });
 
       // Save PID
       fs.writeFileSync(this.pidFile, serverProcess.pid.toString());
 
       // Handle server output
-      serverProcess.stdout.on('data', (data) => {
+      serverProcess.stdout.on('data', data => {
         console.log(`[SERVER] ${data.toString().trim()}`);
       });
 
-      serverProcess.stderr.on('data', (data) => {
+      serverProcess.stderr.on('data', data => {
         console.error(`[SERVER ERROR] ${data.toString().trim()}`);
       });
 
@@ -313,7 +309,7 @@ ${envContent}`;
         }
       }, 2000);
 
-      serverProcess.on('error', (error) => {
+      serverProcess.on('error', error => {
         console.error('❌ Failed to start server:', error.message);
         reject(error);
       });
@@ -330,7 +326,7 @@ ${envContent}`;
     }
 
     console.log(`📂 Copying dist files to ${deploymentPath}...`);
-    
+
     // Create deployment directory
     fs.mkdirSync(deploymentPath, { recursive: true });
 
@@ -339,7 +335,7 @@ ${envContent}`;
     for (const file of files) {
       const srcPath = path.join(this.distDir, file);
       const destPath = path.join(deploymentPath, file);
-      
+
       if (fs.statSync(srcPath).isDirectory()) {
         await this.copyDirectory(srcPath, destPath);
       } else {
@@ -359,11 +355,11 @@ ${envContent}`;
   async copyDirectory(src, dest) {
     fs.mkdirSync(dest, { recursive: true });
     const files = fs.readdirSync(src);
-    
+
     for (const file of files) {
       const srcPath = path.join(src, file);
       const destPath = path.join(dest, file);
-      
+
       if (fs.statSync(srcPath).isDirectory()) {
         await this.copyDirectory(srcPath, destPath);
       } else {
@@ -393,13 +389,13 @@ ${envContent}`;
     try {
       // Ensure deployment directory exists
       this.ensureDeploymentDirectory();
-      
+
       const metadata = this.getDeploymentMetadata();
-      
+
       if (!metadata.currentDeployment) {
         throw new Error('No current deployment found. Run "master-cea deploy" first.');
       }
-      
+
       // Check if server is already running
       const runningPid = await this.isServerRunning();
       if (runningPid) {
@@ -407,35 +403,35 @@ ${envContent}`;
         console.log(`📦 Current deployment: ${metadata.currentDeployment}`);
         return runningPid;
       }
-      
+
       // Find current deployment
       const currentDeployment = metadata.deployments.find(d => d.name === metadata.currentDeployment);
       if (!currentDeployment) {
         throw new Error(`Current deployment '${metadata.currentDeployment}' not found in deployment list`);
       }
-      
+
       console.log('🚀 Starting server from current deployment...');
       console.log(`📦 Deployment: ${metadata.currentDeployment}`);
       console.log(`📁 Path: ${currentDeployment.path}`);
       console.log('');
-      
+
       // Check if deployment directory exists
       if (!fs.existsSync(currentDeployment.path)) {
         throw new Error(`Deployment directory not found: ${currentDeployment.path}`);
       }
-      
+
       // Start the server
       const serverPid = await this.startServer(currentDeployment.path);
-      
+
       // Update metadata with new PID
       currentDeployment.pid = serverPid;
       this.saveDeploymentMetadata(metadata);
-      
+
       console.log('');
       console.log(`✅ Server started successfully!`);
       console.log(`📊 Server PID: ${serverPid}`);
       console.log(`📦 Deployment: ${metadata.currentDeployment}`);
-      
+
       // Exit successfully, after server is started otherwise script keeps running
       process.exit(0);
     } catch (error) {
@@ -447,17 +443,16 @@ ${envContent}`;
     try {
       const metadata = this.getDeploymentMetadata();
       const deploymentsToKeep = 5;
-      
+
       if (metadata.deployments.length <= deploymentsToKeep) {
         return;
       }
 
       // Sort by timestamp and keep only the latest ones
-      const sortedDeployments = metadata.deployments
-        .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-      
+      const sortedDeployments = metadata.deployments.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
       const deploymentsToDelete = sortedDeployments.slice(deploymentsToKeep);
-      
+
       for (const deployment of deploymentsToDelete) {
         const deploymentPath = path.join(this.deploymentsDir, deployment.name);
         if (fs.existsSync(deploymentPath)) {
@@ -479,7 +474,7 @@ ${envContent}`;
     try {
       // Ensure deployment directory exists before proceeding
       this.ensureDeploymentDirectory();
-      
+
       console.log('🚀 Starting Master CEA production deployment...');
       console.log(`📁 Deployment directory: ${this.deploymentsDir}`);
       console.log(`📦 Project source: ${this.projectRoot}`);
@@ -512,18 +507,18 @@ ${envContent}`;
 
       // Update metadata
       const metadata = this.getDeploymentMetadata();
-      
+
       // Store previous deployment for easy rollback
       metadata.previousDeployment = metadata.currentDeployment;
-      
+
       const newDeployment = {
         name: deploymentName,
         timestamp,
         path: deploymentPath,
         pid: serverPid,
-        projectRoot: this.projectRoot
+        projectRoot: this.projectRoot,
       };
-      
+
       metadata.deployments.push(newDeployment);
       metadata.currentDeployment = deploymentName;
       this.saveDeploymentMetadata(metadata);
@@ -539,7 +534,7 @@ ${envContent}`;
       console.log(`📊 Server PID: ${serverPid}`);
       console.log(`📁 Deployment path: ${deploymentPath}`);
       console.log(`🔗 Current symlink: ${this.currentSymlink}`);
-      
+
       if (metadata.previousDeployment) {
         console.log(`⬅️  Previous deployment: ${metadata.previousDeployment} (available for quick rollback)`);
       }
@@ -557,17 +552,17 @@ ${envContent}`;
     try {
       // Ensure deployment directory exists before proceeding
       this.ensureDeploymentDirectory();
-      
+
       console.log('🔄 Starting rollback...');
 
       const metadata = this.getDeploymentMetadata();
-      
+
       if (metadata.deployments.length === 0) {
         throw new Error('No deployments available for rollback');
       }
 
       let targetDeployment;
-      
+
       if (targetDeploymentName) {
         targetDeployment = metadata.deployments.find(d => d.name === targetDeploymentName);
         if (!targetDeployment) {
@@ -582,16 +577,15 @@ ${envContent}`;
           }
         } else {
           // Fallback to second most recent deployment
-          const sortedDeployments = metadata.deployments
-            .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-          
+          const sortedDeployments = metadata.deployments.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
           const currentIndex = sortedDeployments.findIndex(d => d.name === metadata.currentDeployment);
           const previousDeployment = sortedDeployments[currentIndex + 1];
-          
+
           if (!previousDeployment) {
             throw new Error('No previous deployment available for rollback');
           }
-          
+
           targetDeployment = previousDeployment;
         }
       }
@@ -621,7 +615,6 @@ ${envContent}`;
 
       console.log(`✅ Rollback to ${targetDeployment.name} completed successfully!`);
       console.log(`📊 Server PID: ${serverPid}`);
-
     } catch (error) {
       console.error('❌ Rollback failed:', error.message);
     }
@@ -635,9 +628,9 @@ ${envContent}`;
       console.log('💡 Run "master-cea setup" to initialize the production environment');
       return;
     }
-    
+
     const metadata = this.getDeploymentMetadata();
-    
+
     if (metadata.deployments.length === 0) {
       console.log('📋 No deployments found');
       return;
@@ -645,19 +638,18 @@ ${envContent}`;
 
     console.log('📋 Available deployments:');
     console.log('');
-    
-    const sortedDeployments = metadata.deployments
-      .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-    
+
+    const sortedDeployments = metadata.deployments.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
     for (const deployment of sortedDeployments) {
       const isCurrent = deployment.name === metadata.currentDeployment;
       const isPrevious = deployment.name === metadata.previousDeployment;
       let status = '';
       if (isCurrent) status = ' (CURRENT)';
       else if (isPrevious) status = ' (PREVIOUS)';
-      
+
       const date = new Date(deployment.timestamp).toLocaleString();
-      
+
       console.log(`  ${isCurrent ? '→' : isPrevious ? '←' : ' '} ${deployment.name}${status}`);
       console.log(`    📅 ${date}`);
       console.log(`    📁 ${deployment.path}`);
@@ -672,44 +664,45 @@ ${envContent}`;
   async status() {
     // Check if deployment directory exists, but don't fail if it doesn't
     let deploymentDirExists = fs.existsSync(this.deploymentsDir);
-    
-    const metadata = deploymentDirExists ? this.getDeploymentMetadata() : 
-      { deployments: [], previousDeployment: null, currentDeployment: null };
+
+    const metadata = deploymentDirExists
+      ? this.getDeploymentMetadata()
+      : { deployments: [], previousDeployment: null, currentDeployment: null };
     const isRunning = deploymentDirExists ? await this.isServerRunning() : false;
-    
+
     console.log('📊 Master CEA Deployment Status');
     console.log('==============================');
     console.log('');
-    
+
     console.log(`Project root: ${this.projectRoot}`);
     console.log(`Deployment directory: ${this.deploymentsDir}`);
-    
+
     if (!deploymentDirExists) {
       console.log(`⚠️  Deployment directory not found - run 'master-cea setup' first`);
     }
-    
+
     console.log('');
-    
+
     if (metadata.currentDeployment) {
       console.log(`Current deployment: ${metadata.currentDeployment}`);
     } else {
       console.log('Current deployment: None');
     }
-    
+
     if (metadata.previousDeployment) {
       console.log(`Previous deployment: ${metadata.previousDeployment}`);
     } else {
       console.log('Previous deployment: None');
     }
-    
+
     if (isRunning) {
       console.log(`Server status: Running (PID: ${isRunning})`);
     } else {
       console.log('Server status: Not running');
     }
-    
+
     console.log(`Total deployments: ${metadata.deployments.length}`);
-    
+
     if (!deploymentDirExists) {
       console.log('');
       console.log('💡 Run "master-cea setup" to initialize the production environment');
@@ -720,12 +713,12 @@ ${envContent}`;
 // CLI Interface
 async function main() {
   const args = process.argv.slice(2);
-  
+
   // Parse arguments
   let command = null;
   let projectPath = null;
   let commandArg = null;
-  
+
   for (let i = 0; i < args.length; i++) {
     if (args[i] === '--project' || args[i] === '-p') {
       projectPath = args[i + 1];
@@ -736,7 +729,7 @@ async function main() {
       commandArg = args[i];
     }
   }
-  
+
   const deployManager = new DeploymentManager(projectPath);
 
   try {
@@ -744,32 +737,32 @@ async function main() {
       case 'setup':
         await deployManager.setup();
         break;
-        
+
       case 'deploy':
         await deployManager.deploy();
         break;
-        
+
       case 'start':
         await deployManager.startCurrentServer();
         break;
-      
+
       case 'rollback':
         const targetDeploymentName = commandArg || null;
         await deployManager.rollback(targetDeploymentName);
         break;
-      
+
       case 'list':
         deployManager.listDeployments();
         break;
-      
+
       case 'status':
         await deployManager.status();
         break;
-      
+
       case 'stop':
         await deployManager.stopServer();
         break;
-      
+
       default:
         console.log('🤖 Master CEA Deployment Manager');
         console.log('');

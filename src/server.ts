@@ -10,14 +10,14 @@ export function createExpressApp() {
   const environment = config.getConfig().environment;
 
   app.get('/', (_req, res) => {
-    res.send(`Hello, this is the Master CEA${config.isProduction() ? "" : `(${environment})`}!`);
+    res.send(`Hello, this is the Master CEA${config.isProduction() ? '' : `(${environment})`}!`);
   });
 
   app.use('/api', getMessagesRoutes());
   app.use('/assets', express.static(config.getAssetsPath()));
 
   app.get('', (req, res) => {
-    res.status(404).send("Not Found");
+    res.status(404).send('Not Found');
   });
 
   app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
