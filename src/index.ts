@@ -1,8 +1,8 @@
 import 'reflect-metadata';
 import { container } from 'tsyringe';
 import { createExpressApp } from './server';
-import { ConfigurationService, LoggerService } from './services';
-import { registerServices } from './services/bootstrap/service-registry';
+import { ConfigurationService, LoggerService } from './core/services';
+import { registerServices } from './core/bootstrap/services';
 
 async function startApplication(): Promise<void> {
   try {
