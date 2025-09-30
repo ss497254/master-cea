@@ -19,10 +19,17 @@ export interface ILoggingConfig {
   enableFileLogging?: boolean;
 }
 
+export interface ICommandConfig {
+  enableCommands: boolean;
+  prefix: string;
+  allowedUsers?: string[];
+}
+
 export interface IAppConfig {
   bot: AuthConfiguration;
   azureOpenAI: IAzureOpenAIConfig;
   logging: ILoggingConfig;
+  commands: ICommandConfig;
   environment: 'development' | 'production' | 'staging';
   port: number;
   assetsPath?: string;

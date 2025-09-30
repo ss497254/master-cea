@@ -22,6 +22,7 @@ export class EnvironmentConfigLoader extends IConfigLoader {
     return {
       environment: this.getEnvironment(),
       bot: this.loadBotConfig(),
+      commands: this.loadCommandConfig(),
       azureOpenAI: this.loadAzureOpenAIConfig(),
       logging: this.loadLoggingConfig(),
       port: this.getPort(),
@@ -63,6 +64,16 @@ export class EnvironmentConfigLoader extends IConfigLoader {
     return {
       level: (process.env.LOG_LEVEL as 'debug' | 'info' | 'warn' | 'error') || 'info',
       enableConsole: process.env.ENABLE_CONSOLE_LOGGING !== 'false',
+    };
+  }
+
+  private loadCommandConfig() {
+    return {
+      enableCommands: process.env.ENABLE_COMMANDS !== 'false',
+      prefix: process.env.COMMAND_PREFIX || '!',
+      allowedUsers: process.env.ALLOWED_COMMAND_USERS
+        ? process.env.ALLOWED_COMMAND_USERS.split(',').map(s => s.trim())
+        : undefined,
     };
   }
 
