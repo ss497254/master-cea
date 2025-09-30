@@ -7,7 +7,7 @@ export function getMessagesRoutes() {
   const router = Router({ strict: true });
   const config = container.resolve<ConfigurationService>(ConfigurationService);
   const logger = container.resolve<LoggerService>(LoggerService);
-  const messageProcessor = container.resolve<MessageProcessorService>(MessageProcessorService);
+  const messageProcessor = new MessageProcessorService(config, logger);
 
   router.use('/messages', authorizeJWT(config.getBotConfig()), json());
 
