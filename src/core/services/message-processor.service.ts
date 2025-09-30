@@ -2,9 +2,7 @@ import { ActivityHandler, CloudAdapter, TurnContext, type Request } from '@micro
 import { type Response } from 'express';
 import { AIHandler, DemoHandler, EchoHandler } from '../../activity-handlers';
 import { createAdapter } from '../../adapter';
-import { ListModeCommand } from '../../commands/list-mode';
-import { MenuCommand } from '../../commands/menu';
-import { SetModeCommand } from '../../commands/set-mode';
+import { HelpCommand, ListModeCommand, MenuCommand, SetModeCommand } from '../../commands';
 import { getMessageTextFromActivity } from '../../utils/helpers';
 import { CommandExecutor, CommandParser } from '../commands';
 import { ConfigurationService } from './configuration-service';
@@ -33,6 +31,7 @@ export class MessageProcessorService {
     this.commandExecutor.register(new ListModeCommand(Object.keys(this.handlers)));
     this.commandExecutor.register(new SetModeCommand());
     this.commandExecutor.register(new MenuCommand());
+    this.commandExecutor.register(new HelpCommand(this.commandExecutor));
   }
 
   async process(req: Request, res: Response) {
