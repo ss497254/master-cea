@@ -23,6 +23,12 @@ export class CommandExecutor {
     const cmd = this.commands.get(request.command)!;
 
     try {
+      if (!cmd) {
+        throw new CommandError(
+          `❓ Unknown command: ${this.config.prefix}${request.command}. Type ${this.config.prefix}help to see available commands.`
+        );
+      }
+
       // TODO: incorrect logic, fix it later
       // required args check
       const missingArgs = cmd.args
@@ -55,7 +61,7 @@ export class CommandExecutor {
         cmd.args && cmd.args.length > 0
           ? ' ' + cmd.args.map(a => (a.required ? `<${a.name}>` : `[${a.name}]`)).join(' ')
           : '';
-      output += `${this.config.prefix}${cmd.name}${argsText} - ${cmd.description}\n`;
+      output += `- ${this.config.prefix}${cmd.name}${argsText} - ${cmd.description}\n`;
     }
     return output.trim();
   }
