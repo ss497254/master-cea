@@ -30,6 +30,8 @@ export class CommandParser {
   private isValidMessage(message: string): boolean {
     if (message.length === 0) {
       return false;
+    } else if (!message.startsWith(this.config.prefix)) {
+      return false;
     } else if (message.length > 1000) {
       return false;
     } else if (!/^[\x20-\x7E]*$/.test(message)) {

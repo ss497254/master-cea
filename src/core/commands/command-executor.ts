@@ -49,6 +49,7 @@ export class CommandExecutor {
     } catch (err) {
       if (err instanceof CommandError) {
         await context.sendActivity(err.message);
+        return;
       }
       await context.sendActivity(`⚠️ Error executing ${request.command}: ${(err as Error).message}`);
     }
