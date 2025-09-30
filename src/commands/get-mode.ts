@@ -1,16 +1,11 @@
 import { TurnContext, UserState } from '@microsoft/agents-hosting';
-import { USER_MODE_STATE_KEY } from '../config/constants';
 import { Command } from '../core/commands/command';
 import { CommandRequest } from '../interfaces';
+import { USER_MODE_STATE_KEY } from '../config/constants';
 
-export class SetModeCommand extends Command {
+export class GetModeCommand extends Command {
   constructor(private userState: UserState) {
-    super('set-mode', 'Set the mode', [
-      {
-        name: 'mode',
-        required: true,
-      },
-    ]);
+    super('get-mode', 'Get the mode');
   }
 
   canExecute(request: CommandRequest): boolean | Promise<boolean> {
@@ -20,8 +15,7 @@ export class SetModeCommand extends Command {
 
   async execute(request: CommandRequest, context: TurnContext) {
     const userModeAccessor = this.userState.createProperty<string>(USER_MODE_STATE_KEY);
-    await userModeAccessor.set(context, request.args[0]);
-    await this.userState.saveChanges(context, false);
-    await context.sendActivity(`Setting mode to: ${request.args[0]}`);
+    const mode = await userModeAccessor.get(context);
+    await context.sendActivity(`Current mode is: ${mode ?? 'echo'}`);
   }
 }

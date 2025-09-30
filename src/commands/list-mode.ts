@@ -4,7 +4,7 @@ import { CommandRequest } from '../interfaces';
 
 export class ListModeCommand extends Command {
   constructor(private modes: string[] = []) {
-    super('mode', 'List available modes');
+    super('list-mode', 'List available modes');
   }
 
   canExecute(request: CommandRequest): boolean | Promise<boolean> {
