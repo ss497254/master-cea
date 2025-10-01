@@ -16,21 +16,26 @@ async function startApplication(): Promise<void> {
     await config.load();
 
     const app = createExpressApp();
+    const port = config.getPort();
 
     app.disable('x-powered-by');
 
-    app.listen(config.getPort(), () => {
-      logger.info(`🌐 Server listening on port ${config.getPort()}`);
+    app.listen(port, error => {
+      if (error) {
+        logger.error('Error starting server: ' + error.message);
+      } else {
+        logger.info(`🌐 Server listening on port ${port}`);
+      }
     });
     logger.info('Starting MasterCEA in ' + process.env.NODE_ENV);
 
     // The server is already listening since startServer handles that
     logger.info('MasterCEA started successfully', {
-      port: config.getPort(),
+      port,
       environment: config.getConfig().environment,
       endpoints: {
-        health: `http://localhost:${config.getPort()}/health`,
-        messages: `http://localhost:${config.getPort()}/api/messages`,
+        health: `http://localhost:${port}/health`,
+        messages: `http://localhost:${port}/api/messages`,
       },
     });
 

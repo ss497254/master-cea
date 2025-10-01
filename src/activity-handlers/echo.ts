@@ -7,7 +7,7 @@ export class EchoHandler extends ActivityHandler {
       const membersAdded = context.activity.membersAdded;
       for (const member of membersAdded!) {
         if (member.id !== context.activity.recipient!.id) {
-          await context.sendActivity('Welcome to the Teams bot!');
+          await context.sendActivity('Welcome to the Echo bot!');
         }
       }
       await next();
