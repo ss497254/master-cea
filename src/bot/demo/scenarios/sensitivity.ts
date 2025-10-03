@@ -4,6 +4,7 @@ import { sendActivity } from 'src/utils/helpers';
 
 export const SensitivityRoute: BotMessageRoute = {
   keyword: 'sensitivity',
+  description: 'Sends a message with sensitivity labels and AI-generated content',
   handler: async context => {
     const activity = {
       type: ActivityTypes.Message,
