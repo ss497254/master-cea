@@ -24,10 +24,34 @@ export interface ICommandConfig {
   prefix: string;
 }
 
+export type StorageConfig =
+  | {
+      type: 'memory';
+    }
+  | {
+      type: 'file';
+      filePath: string;
+    }
+  | {
+      type: 'blob';
+      containerId: string;
+      connectionString: string;
+    }
+  | {
+      type: 'cosmosdb';
+      databaseId: string;
+      containerId: string;
+      cosmosClientOptions: {
+        endpoint: string;
+        key: string;
+      };
+    };
+
 export interface IAppConfig {
   bot: AuthConfiguration;
   azureOpenAI: IAzureOpenAIConfig;
   logging: ILoggingConfig;
+  storage: StorageConfig;
   commands: ICommandConfig;
   environment: 'development' | 'production' | 'staging';
   port: number;

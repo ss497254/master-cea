@@ -20,11 +20,12 @@ export class EnvironmentConfigLoader extends IConfigLoader {
     this.logger.debug('Loading configuration from environment variables');
 
     return {
-      environment: this.getEnvironment(),
+      azureOpenAI: this.loadAzureOpenAIConfig(),
       bot: this.loadBotConfig(),
       commands: this.loadCommandConfig(),
-      azureOpenAI: this.loadAzureOpenAIConfig(),
+      storage: this.loadStorageConfig(),
       logging: this.loadLoggingConfig(),
+      environment: this.getEnvironment(),
       port: this.getPort(),
     };
   }
@@ -72,6 +73,38 @@ export class EnvironmentConfigLoader extends IConfigLoader {
       enableCommands: process.env.ENABLE_COMMANDS === 'true',
       prefix: process.env.COMMAND_PREFIX || '-',
     };
+  }
+
+  private loadStorageConfig() {
+    const type = process.env.STORAGE_TYPE || 'memory';
+    switch (type) {
+      case 'memory':
+        return { type: 'memory' } as const;
+      case 'file':
+        return {
+          type: 'file',
+          filePath: process.env.STORAGE_FILE_PATH || './bot-storage.json',
+        } as const;
+      case 'blob':
+        return {
+          type: 'blob',
+          containerId: process.env.BLOB_CONTAINER_ID || 'bot-container',
+          connectionString: process.env.BLOB_CONNECTION_STRING || '',
+        } as const;
+      case 'cosmosdb':
+        return {
+          type: 'cosmosdb',
+          databaseId: process.env.COSMOSDB_DATABASE_ID || 'BotDatabase',
+          containerId: process.env.COSMOSDB_CONTAINER_ID || 'BotContainer',
+          cosmosClientOptions: {
+            endpoint: process.env.COSMOSDB_ENDPOINT || '',
+            key: process.env.COSMOSDB_KEY || '',
+          },
+        } as const;
+      default:
+        this.logger.warn(`Unknown STORAGE_TYPE "${type}", defaulting to memory storage.`);
+        return { type: 'memory' } as const;
+    }
   }
 
   private getPort(): number {

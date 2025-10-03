@@ -48,6 +48,10 @@ export class ConfigurationService {
     return this.config.commands;
   }
 
+  public getStorageConfig() {
+    return this.config.storage;
+  }
+
   public isConfigLoaded(): boolean {
     return this._config !== undefined;
   }
