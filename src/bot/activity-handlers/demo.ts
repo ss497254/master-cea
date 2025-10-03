@@ -1,4 +1,3 @@
-import { ActivityTypes } from '@microsoft/agents-activity';
 import {
   ActivityHandler,
   AuthConfiguration,
@@ -8,45 +7,33 @@ import {
   TurnContext,
   TurnState,
 } from '@microsoft/agents-hosting';
-import { LoggerService } from '../core/services';
+import { registerMessageRoutes } from 'src/bot/demo/register';
+import { ILogger } from 'src/interfaces/services/logger';
+import { getMessageTextFromActivity } from 'src/utils/helpers';
 
 export class DemoHandler extends ActivityHandler {
   protected readonly _routes: RouteList<TurnState> = new RouteList<TurnState>();
 
   constructor(
     private config: AuthConfiguration,
-    private logger: LoggerService
+    private logger: ILogger
   ) {
     super();
     this.onMessage(async (context, next) => {
-      await this.handleMessage(context);
+      const state = new TurnState();
+
+      for (const route of this._routes) {
+        if (await route.selector(context)) {
+          await route.handler(context, state);
+        }
+      }
       await next();
     });
 
-    this.message('help', async (context: TurnContext) => {
-      await context.sendActivity('This is the demo bot. You can say "hello" to get started.');
-    });
-
-    this.message('hello', async (context: TurnContext) => {
-      await context.sendActivity(`You said: ${context.activity.text}`);
-    });
-
-    this.message('', async (context: TurnContext) => {
-      await context.sendActivity("I'm not sure how to respond to that. Type 'help' for assistance.");
-    });
+    registerMessageRoutes(this, this.logger);
   }
 
-  private async handleMessage(context: TurnContext) {
-    const state = new TurnState();
-
-    for (const route of this._routes) {
-      if (await route.selector(context)) {
-        await route.handler(context, state);
-      }
-    }
-  }
-
-  private message(
+  public message(
     keyword: string | RegExp | RouteSelector | (string | RegExp | RouteSelector)[],
     handler: (context: TurnContext, state: TurnState) => Promise<void>,
     isInvokeRoute: boolean = false,
@@ -64,8 +51,9 @@ export class DemoHandler extends ActivityHandler {
       return keyword;
     } else if (keyword instanceof RegExp) {
       return (context: TurnContext) => {
-        if (context?.activity?.type === ActivityTypes.Message && context.activity.text) {
-          return Promise.resolve(keyword.test(context.activity.text));
+        const message = getMessageTextFromActivity(context.activity);
+        if (message) {
+          return Promise.resolve(keyword.test(message));
         } else {
           return Promise.resolve(false);
         }
@@ -73,8 +61,9 @@ export class DemoHandler extends ActivityHandler {
     } else {
       const k = keyword.toString().toLocaleLowerCase();
       return (context: TurnContext) => {
-        if (context?.activity?.type === ActivityTypes.Message && context.activity.text) {
-          return Promise.resolve(context.activity.text.toLocaleLowerCase() === k);
+        const message = getMessageTextFromActivity(context.activity);
+        if (message) {
+          return Promise.resolve(message.toLocaleLowerCase() === k);
         } else {
           return Promise.resolve(false);
         }

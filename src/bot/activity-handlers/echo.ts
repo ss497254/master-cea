@@ -4,6 +4,7 @@ export class EchoHandler extends ActivityHandler {
   constructor() {
     super();
     this.onMembersAdded(async (context, next) => {
+      console.log('Members added:', context.activity.membersAdded, context.activity);
       const membersAdded = context.activity.membersAdded;
       for (const member of membersAdded!) {
         if (member.id !== context.activity.recipient!.id) {
