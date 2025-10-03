@@ -83,7 +83,7 @@ export class EnvironmentConfigLoader extends IConfigLoader {
       case 'file':
         return {
           type: 'file',
-          filePath: process.env.STORAGE_FILE_PATH || './bot-storage.json',
+          filePath: process.env.STORAGE_FOLDER_PATH || './bot-storage',
         } as const;
       case 'blob':
         return {
