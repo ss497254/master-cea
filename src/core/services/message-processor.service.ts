@@ -2,6 +2,7 @@ import {
   ActivityHandler,
   CloudAdapter,
   ConversationState,
+  FileStorage,
   MemoryStorage,
   Storage,
   TurnContext,
@@ -9,15 +10,16 @@ import {
   type Request,
 } from '@microsoft/agents-hosting';
 import { type Response } from 'express';
-import { AIHandler, DemoHandler, EchoHandler } from '../../activity-handlers';
+import { StorageConfig } from 'src/interfaces';
 import { createAdapter } from '../../adapter';
+import { AIHandler, DemoHandler, EchoHandler } from '../../bot/activity-handlers';
 import { HelpCommand, ListModeCommand, MenuCommand, SetModeCommand } from '../../commands';
+import { GetModeCommand } from '../../commands/get-mode';
+import { USER_MODE_STATE_KEY } from '../../config/constants';
+import { ILogger } from '../../interfaces/services/logger';
 import { getMessageTextFromActivity } from '../../utils/helpers';
 import { CommandExecutor, CommandParser } from '../commands';
 import { ConfigurationService } from './configuration-service';
-import { LoggerService } from './logger-service';
-import { GetModeCommand } from '../../commands/get-mode';
-import { USER_MODE_STATE_KEY } from '../../config/constants';
 
 export class MessageProcessorService {
   private adapter: CloudAdapter;
@@ -30,12 +32,12 @@ export class MessageProcessorService {
 
   constructor(
     private config: ConfigurationService,
-    private logger: LoggerService
+    private logger: ILogger
   ) {
     this.adapter = createAdapter();
     this.commandParser = new CommandParser(this.config.getCommandConfig());
     this.commandExecutor = new CommandExecutor(this.config.getCommandConfig());
-    this.storage = new MemoryStorage();
+    this.storage = this.createStorage(this.config.getStorageConfig());
     this.conversationState = new ConversationState(this.storage);
     this.userState = new UserState(this.storage);
 
@@ -82,7 +84,16 @@ export class MessageProcessorService {
     if (mode && mode in this.handlers) {
       return this.handlers[mode];
     } else {
-      return this.handlers.echo; // default handler
+      return this.handlers.demo; // default handler
     }
+  }
+
+  private createStorage(config: StorageConfig): Storage {
+    if (config.type === 'file') {
+      return new FileStorage(config.filePath);
+    }
+
+    // Add other storage types as needed
+    return new MemoryStorage();
   }
 }
