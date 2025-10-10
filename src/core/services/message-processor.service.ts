@@ -20,6 +20,7 @@ import { ILogger } from '../../interfaces/services/logger';
 import { getMessageTextFromActivity } from '../../utils/helpers';
 import { CommandExecutor, CommandParser } from '../commands';
 import { ConfigurationService } from './configuration-service';
+import { EchoActivityHandler } from 'src/bot/activity-handlers/echo-activity';
 
 export class MessageProcessorService {
   private adapter: CloudAdapter;
@@ -43,6 +44,7 @@ export class MessageProcessorService {
 
     this.handlers = {
       echo: new EchoHandler(),
+      'echo-activity': new EchoActivityHandler(),
       demo: new DemoHandler(config.getBotConfig(), this.logger),
       ai: new AIHandler(config.getAzureOpenAIConfig(), this.logger),
     };
