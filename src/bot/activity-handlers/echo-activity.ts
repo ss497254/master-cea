@@ -23,7 +23,7 @@ export class EchoActivityHandler extends ActivityHandler {
         body: [
           {
             type: 'TextBlock',
-            text: `Activity Received: type=${context.activity.type}, id=${context.activity.id}, from=${context.activity.from?.name}`,
+            text: `Activity Received: type=${context.activity.type}, from=${context.activity.from?.name ?? 'unknown'}`,
             size: 'Medium',
           },
           {
