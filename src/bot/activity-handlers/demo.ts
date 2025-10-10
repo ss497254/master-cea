@@ -63,7 +63,7 @@ export class DemoHandler extends ActivityHandler {
       return (context: TurnContext) => {
         const message = getMessageTextFromActivity(context.activity);
         if (message) {
-          return Promise.resolve(message.toLocaleLowerCase() === k);
+          return Promise.resolve(k.length ? message.toLocaleLowerCase() === k : true);
         } else {
           return Promise.resolve(false);
         }
