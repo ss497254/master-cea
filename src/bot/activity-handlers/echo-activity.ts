@@ -29,6 +29,7 @@ export class EchoActivityHandler extends ActivityHandler {
           {
             type: 'CodeBlock',
             codeSnippet: JSON.stringify(context.activity, null, 2),
+            language: 'Json',
           },
         ],
       });
