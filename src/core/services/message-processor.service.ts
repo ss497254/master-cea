@@ -83,7 +83,7 @@ export class MessageProcessorService {
     const userModeAccessor = this.userState.createProperty<string>(USER_MODE_STATE_KEY);
     const mode = await userModeAccessor.get(context);
 
-    if (mode && mode in this.handlers) {
+    if (!!mode && mode in this.handlers) {
       return this.handlers[mode];
     } else {
       return this.handlers.demo; // default handler

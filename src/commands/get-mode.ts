@@ -16,6 +16,6 @@ export class GetModeCommand extends Command {
   async execute(request: CommandRequest, context: TurnContext) {
     const userModeAccessor = this.userState.createProperty<string>(USER_MODE_STATE_KEY);
     const mode = await userModeAccessor.get(context);
-    await context.sendActivity(`Current mode is: ${mode ?? 'echo'}`);
+    await context.sendActivity(`Current mode is: ${mode ?? 'demo'}`);
   }
 }
