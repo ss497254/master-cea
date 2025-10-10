@@ -16,30 +16,18 @@ export class EchoActivityHandler extends ActivityHandler {
     });
 
     this.onMessage(async (context, next) => {
-      await sendCard(context, {
-        type: 'AdaptiveCard',
-        $schema: 'https://adaptivecards.io/schemas/adaptive-card.json',
-        version: '1.5',
-        body: [
-          {
-            type: 'TextBlock',
-            text: `Activity Received: type=${context.activity.type}, from=${context.activity.from?.name ?? 'unknown'}`,
-            size: 'Medium',
-          },
-          {
-            type: 'CodeBlock',
-            codeSnippet: JSON.stringify(context.activity, null, 2),
-            language: 'Json',
-          },
-        ],
-      });
+      await context.sendActivity(`\
+\`\`\`json
+${JSON.stringify(context.activity, null, 2)}
+\`\`\``);
       await next();
     });
 
     this.onInvokeActivity = async context => {
-      console.log('Invoke activity received:', context.activity);
-      // Handle the invoke activity here
-      await context.sendActivity(`Invoke activity received with name: ${context.activity.name}`);
+      await context.sendActivity(`\
+\`\`\`json
+${JSON.stringify(context.activity, null, 2)}
+\`\`\``);
       return { status: 200 };
     };
   }
