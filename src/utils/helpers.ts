@@ -22,3 +22,19 @@ export function sendCard(context: TurnContext, card: object) {
 export function sendActivity(context: TurnContext, activity: object) {
   return context.sendActivity(Activity.fromObject(activity));
 }
+
+export function isMessageActivityForRoute(activity: Activity, keyword: string | RegExp): boolean {
+  const messageText = getMessageTextFromActivity(activity) || '';
+
+  if (typeof keyword === 'string') {
+    return messageText.toLowerCase().includes(keyword.toLowerCase());
+  } else if (keyword instanceof RegExp) {
+    return keyword.test(messageText);
+  }
+
+  return false;
+}
+
+export function isInvokeActivityForRoute(activity: Activity, name: string): boolean {
+  return Activity.fromObject(activity).name === name;
+}
