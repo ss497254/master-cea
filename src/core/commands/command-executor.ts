@@ -20,7 +20,7 @@ export class CommandExecutor {
   }
 
   async execute(request: CommandRequest, context: TurnContext): Promise<void> {
-    const cmd = this.commands.get(request.command)!;
+    const cmd = this.commands.get(request.command);
 
     try {
       if (!cmd) {

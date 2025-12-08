@@ -6,7 +6,7 @@
   "scripts": {
     "build": "bun esbuild.config.js",
     "build:watch": "bun esbuild.config.js --watch",
-    "build:prod": "NODE_ENV=production && bun esbuild.config.js",
+    "build:prod": "NODE_ENV=production bun esbuild.config.js",
     "start": "bun dist/index.js",
     "dev": "nodemon",
     "debug": "bun --inspect=localhost:9229 src/index.ts",

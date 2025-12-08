@@ -1,5 +1,6 @@
 import 'reflect-metadata';
 import { container } from 'tsyringe';
+import type { Server } from 'http';
 import { createExpressApp } from './server';
 import { ConfigurationService, LoggerService } from './core/services';
 import { registerServices } from './core/bootstrap/services';
@@ -20,7 +21,7 @@ async function startApplication(): Promise<void> {
 
     app.disable('x-powered-by');
 
-    app.listen(port, error => {
+    const server: Server = app.listen(port, error => {
       if (error) {
         logger.error('Error starting server: ' + error.message);
       } else {
@@ -45,7 +46,14 @@ async function startApplication(): Promise<void> {
     const shutdown = async (signal: string) => {
       logger.info(`Received ${signal}, shutting down gracefully`);
       container.dispose();
-      process.exit(0);
+      server.close((err) => {
+        if (err) {
+          logger.error('Error closing server:', err);
+        } else {
+          logger.info('Server closed gracefully');
+        }
+        process.exit(0);
+      });
     };
 
     process.on('SIGTERM', () => shutdown('SIGTERM'));

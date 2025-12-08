@@ -44,8 +44,8 @@ export class EnvironmentConfigLoader extends IConfigLoader {
       authority,
       issuers: [
         'https://api.botframework.com',
-        `https://sts.windows.net/${process.env.tenantId}/`,
-        `${authority}/${process.env.tenantId}/v2.0`,
+        `https://sts.windows.net/${process.env.TENANT_ID}/`,
+        `${authority}/${process.env.TENANT_ID}/v2.0`,
       ],
     };
   }

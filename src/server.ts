@@ -13,13 +13,19 @@ export function createExpressApp() {
     res.send(`Hello, this is the Master CEA${config.isProduction() ? '' : `(${environment})`}!`);
   });
 
+  app.get('/health', (_req, res) => {
+    res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
+  });
+
   app.use('/api', getMessagesRoutes());
   app.use('/assets', express.static(config.getAssetsPath()));
 
+  // 404 handler - must be after all routes
   app.get('', (req, res) => {
     res.status(404).send('Not Found');
   });
 
+  // Error handler - must be last
   app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
     logger.error('Error processing request:', err, { url: req.url, method: req.method });
     res.status(500).send('Something broke!');
