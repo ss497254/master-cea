@@ -1,4 +1,9 @@
-export function getHelpCard(routes: string[]) {
+type HelpAction = {
+  title: string;
+  value: string;
+};
+
+export function getHelpCard(routes: HelpAction[]) {
   return {
     type: 'AdaptiveCard',
     body: [
@@ -16,14 +21,14 @@ export function getHelpCard(routes: string[]) {
         text: 'I support following messages, feel free to click and explore functionality',
       },
     ],
-    actions: routes.map(route => ({
+    actions: routes.map(({ title, value }) => ({
       type: 'Action.Submit',
-      title: route,
+      title,
       data: {
         msteams: {
           type: 'Imback',
-          title: route,
-          value: route,
+          title,
+          value,
         },
       },
     })),

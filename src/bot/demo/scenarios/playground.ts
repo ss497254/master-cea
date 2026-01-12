@@ -11,7 +11,7 @@ export const PlaygroundRoute: BotMessageRoute = {
 };
 
 export const PlaygroundInvokeRoute: BotInvokeRoute = {
-  name: 'playground',
+  name: 'invoke',
   handler: async context => {
     const payload = context.activity.value ?? (context.activity.value as any)?.data;
 
