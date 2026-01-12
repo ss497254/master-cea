@@ -47,15 +47,23 @@ export type StorageConfig =
       };
     };
 
+export interface IOrchestratorConfig {
+  enabled: boolean;
+  deploymentName: string;
+  cacheTTL: number; // seconds
+}
+
 export interface IAppConfig {
   bot: AuthConfiguration;
   azureOpenAI: IAzureOpenAIConfig;
+  orchestrator: IOrchestratorConfig;
   logging: ILoggingConfig;
   storage: StorageConfig;
   commands: ICommandConfig;
   environment: 'development' | 'production' | 'staging';
   port: number;
-  assetsPath?: string;
+  assetsDir: string;
+  basePath: string;
 }
 
 // Configuration loader interface
