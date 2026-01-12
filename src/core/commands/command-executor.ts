@@ -1,6 +1,6 @@
-import { TurnContext } from '@microsoft/agents-hosting';
-import { CommandRequest, ICommandConfig } from '../../interfaces';
-import { Command, CommandError } from './command';
+import { TurnContext } from "@microsoft/agents-hosting";
+import { CommandRequest, ICommandConfig } from "../../interfaces";
+import { Command, CommandError } from "./command";
 
 export class CommandExecutor {
   private commands: Map<string, Command> = new Map();
@@ -37,7 +37,7 @@ export class CommandExecutor {
         .filter(Boolean);
 
       if (missingArgs.length > 0) {
-        throw new CommandError(`Missing required arguments: ${missingArgs.join(', ')}`);
+        throw new CommandError(`Missing required arguments: ${missingArgs.join(", ")}`);
       }
 
       // permission check
@@ -56,12 +56,12 @@ export class CommandExecutor {
   }
 
   help(): string {
-    let output = '📖 Available commands:\n';
+    let output = "📖 Available commands:\n";
     for (const cmd of this.commands.values()) {
       const argsText =
         cmd.args && cmd.args.length > 0
-          ? ' ' + cmd.args.map(a => (a.required ? `<${a.name}>` : `[${a.name}]`)).join(' ')
-          : '';
+          ? " " + cmd.args.map(a => (a.required ? `<${a.name}>` : `[${a.name}]`)).join(" ")
+          : "";
       output += `- ${this.config.prefix}${cmd.name}${argsText} - ${cmd.description}\n`;
     }
     return output.trim();

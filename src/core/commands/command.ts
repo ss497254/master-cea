@@ -1,5 +1,5 @@
-import { TurnContext } from '@microsoft/agents-hosting';
-import { CommandRequest } from '../../interfaces';
+import { TurnContext } from "@microsoft/agents-hosting";
+import { CommandRequest } from "../../interfaces";
 
 export abstract class Command {
   name: string;
@@ -21,6 +21,6 @@ export abstract class Command {
 export class CommandError extends Error {
   constructor(message: string) {
     super(message);
-    this.name = 'CommandError';
+    this.name = "CommandError";
   }
 }

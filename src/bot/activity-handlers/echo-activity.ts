@@ -1,15 +1,14 @@
-import { ActivityHandler } from '@microsoft/agents-hosting';
-import { sendCard } from 'src/utils/helpers';
+import { ActivityHandler } from "@microsoft/agents-hosting";
 
 export class EchoActivityHandler extends ActivityHandler {
   constructor() {
     super();
     this.onMembersAdded(async (context, next) => {
-      console.log('Members added:', context.activity.membersAdded, context.activity);
+      console.log("Members added:", context.activity.membersAdded, context.activity);
       const membersAdded = context.activity.membersAdded;
       for (const member of membersAdded!) {
         if (member.id !== context.activity.recipient!.id) {
-          await context.sendActivity('Welcome to the Echo Activity bot!');
+          await context.sendActivity("Welcome to the Echo Activity bot!");
         }
       }
       await next();

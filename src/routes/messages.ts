@@ -1,7 +1,7 @@
-import { authorizeJWT, type Request } from '@microsoft/agents-hosting';
-import { json, Router, type Response } from 'express';
-import { container } from 'tsyringe';
-import { ConfigurationService, LoggerService, MessageProcessorService } from '../core/services';
+import { authorizeJWT, type Request } from "@microsoft/agents-hosting";
+import { json, Router, type Response } from "express";
+import { container } from "tsyringe";
+import { ConfigurationService, LoggerService, MessageProcessorService } from "../core/services";
 
 export function getMessagesRoute() {
   const router = Router({ strict: true });
@@ -9,16 +9,16 @@ export function getMessagesRoute() {
   const logger = container.resolve<LoggerService>(LoggerService);
   const messageProcessor = new MessageProcessorService(config, logger);
 
-  router.use('/', authorizeJWT(config.getBotConfig()), json());
+  router.use("/", authorizeJWT(config.getBotConfig()), json());
 
-  router.post('/', async (req: Request, res: Response) => {
+  router.post("/", async (req: Request, res: Response) => {
     try {
       await messageProcessor.process(req, res);
     } catch (error) {
-      logger.error('Error processing request:', error as Error);
+      logger.error("Error processing request:", error as Error);
       res.status(500).json({
-        error: 'Internal server error',
-        message: 'Sorry, I encountered an error processing your request.',
+        error: "Internal server error",
+        message: "Sorry, I encountered an error processing your request.",
       });
     }
   });

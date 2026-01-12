@@ -3,10 +3,10 @@
  */
 
 // Configuration interfaces
-export * from './config';
+export * from "./config";
 
 // Bot-related interfaces
-export * from './bot';
+export * from "./bot";
 
 // Orchestrator interfaces
-export * from './orchestrator';
+export * from "./orchestrator";

@@ -1,10 +1,10 @@
 /* eslint-disable no-unsafe-finally */
-import { ActivityTypes } from '@microsoft/agents-activity';
-import { ActivityHandler, AuthConfiguration, TurnContext } from '@microsoft/agents-hosting';
-import { getActivityRoutes } from 'src/bot/demo/routes';
-import { BotInvokeRoute, BotMessageRoute } from 'src/interfaces/bot/route';
-import { ILogger } from 'src/interfaces/services/logger';
-import { isInvokeActivityForRoute, isMessageActivityForRoute } from 'src/utils/helpers';
+import { ActivityTypes } from "@microsoft/agents-activity";
+import { ActivityHandler, AuthConfiguration, TurnContext } from "@microsoft/agents-hosting";
+import { getActivityRoutes } from "src/bot/demo/routes";
+import { BotInvokeRoute, BotMessageRoute } from "src/interfaces/bot/route";
+import { ILogger } from "src/interfaces/services/logger";
+import { isInvokeActivityForRoute, isMessageActivityForRoute } from "src/utils/helpers";
 
 export class DemoHandler extends ActivityHandler {
   protected readonly routes: {
@@ -40,8 +40,8 @@ export class DemoHandler extends ActivityHandler {
           this.logger.info(`Handling message route: ${route.keyword}`);
           await route.handler(context);
         } catch (error) {
-          this.logger.error('Error handling message route:', error as Error);
-          await context.sendActivity('Sorry, something went wrong while processing your request.');
+          this.logger.error("Error handling message route:", error as Error);
+          await context.sendActivity("Sorry, something went wrong while processing your request.");
         } finally {
           if (context.responded) return;
         }
@@ -59,8 +59,8 @@ export class DemoHandler extends ActivityHandler {
           this.logger.info(`Handling invoke route: ${route.name}`);
           await route.handler(context);
         } catch (error) {
-          this.logger.error('Error handling invoke route:', error as Error);
-          await context.sendActivity('Sorry, something went wrong while processing your request.');
+          this.logger.error("Error handling invoke route:", error as Error);
+          await context.sendActivity("Sorry, something went wrong while processing your request.");
         } finally {
           if (context.responded) return;
         }

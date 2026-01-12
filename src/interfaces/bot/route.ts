@@ -1,4 +1,4 @@
-import { TurnContext } from '@microsoft/agents-hosting';
+import { TurnContext } from "@microsoft/agents-hosting";
 
 export type BotMessageRoute = {
   keyword: string | RegExp;

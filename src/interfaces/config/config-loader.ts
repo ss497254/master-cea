@@ -1,4 +1,4 @@
-import { IAppConfig } from './index';
+import { IAppConfig } from "./index";
 
 /**
  * Abstract base interface for configuration loaders

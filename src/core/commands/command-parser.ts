@@ -1,4 +1,4 @@
-import { ICommandConfig, CommandRequest } from '../../interfaces';
+import { ICommandConfig, CommandRequest } from "../../interfaces";
 
 export class CommandParser {
   constructor(private config: ICommandConfig) {}
@@ -16,9 +16,9 @@ export class CommandParser {
     const namedArgs: Record<string, string> = {};
 
     for (const part of parts.slice(1)) {
-      if (part.startsWith('--')) {
-        const [key, value] = part.slice(2).split('=', 2);
-        namedArgs[key] = value ?? 'true';
+      if (part.startsWith("--")) {
+        const [key, value] = part.slice(2).split("=", 2);
+        namedArgs[key] = value ?? "true";
       } else {
         args.push(part);
       }
@@ -36,7 +36,7 @@ export class CommandParser {
       return false;
     } else if (!/^[\x20-\x7E]*$/.test(message)) {
       return false; // non-ASCII characters
-    } else if (message.includes('\n')) {
+    } else if (message.includes("\n")) {
       return false; // newlines
     }
     return true;

@@ -1,8 +1,8 @@
-import { AzureOpenAIProvider, createAzure } from '@ai-sdk/azure';
-import { ActivityHandler, TurnContext } from '@microsoft/agents-hosting';
-import { streamText } from 'ai';
-import { IAzureOpenAIConfig } from '../../interfaces';
-import { ILogger } from '../../interfaces/services/logger';
+import { AzureOpenAIProvider, createAzure } from "@ai-sdk/azure";
+import { ActivityHandler, TurnContext } from "@microsoft/agents-hosting";
+import { streamText } from "ai";
+import { IAzureOpenAIConfig } from "../../interfaces";
+import { ILogger } from "../../interfaces/services/logger";
 
 const SYSTEM_PROMPT = `\
 You are a witty, sarcastic, and hilariously funny friend who somehow manages to be helpful despite your attitude. You have a sharp sense of humor and love to respond with clever sarcasm, witty remarks, and humorous observations. 
@@ -65,17 +65,17 @@ export class AIHandler extends ActivityHandler {
     context.streamingResponse.setFeedbackLoop(true);
     context.streamingResponse.setGeneratedByAILabel(true);
     context.streamingResponse.setSensitivityLabel({
-      type: 'https://schema.org/Message',
-      '@type': 'CreativeWork',
-      name: 'Internal',
+      type: "https://schema.org/Message",
+      "@type": "CreativeWork",
+      name: "Internal",
     });
-    context.streamingResponse.queueInformativeUpdate('thinking...');
+    context.streamingResponse.queueInformativeUpdate("thinking...");
 
-    const message = context.activity.text?.trim() || '';
+    const message = context.activity.text?.trim() || "";
 
     // Handle empty messages
     if (!message) {
-      await context.sendActivity('Please ask me a question or let me know how I can help you!');
+      await context.sendActivity("Please ask me a question or let me know how I can help you!");
       return;
     }
 
@@ -88,13 +88,13 @@ export class AIHandler extends ActivityHandler {
     try {
       for await (const part of fullStream) {
         switch (part.type) {
-          case 'text-delta': {
+          case "text-delta": {
             if (part.text.length > 0) {
               context.streamingResponse.queueTextChunk(part.text);
             }
             break;
           }
-          case 'error': {
+          case "error": {
             const error = part.error;
             throw new Error(`Error in streaming: ${error}`);
             break;
@@ -102,14 +102,14 @@ export class AIHandler extends ActivityHandler {
         }
       }
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
-      this.logger.error('Error during AI streaming:', new Error(errorMessage));
+      const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";
+      this.logger.error("Error during AI streaming:", new Error(errorMessage));
       context.streamingResponse.queueTextChunk(
-        'I apologize, but I encountered an error while processing your request. Please try again later.'
+        "I apologize, but I encountered an error while processing your request. Please try again later."
       );
     } finally {
       await context.streamingResponse.endStream();
-      this.logger.info('AI streaming completed');
+      this.logger.info("AI streaming completed");
     }
   }
 }

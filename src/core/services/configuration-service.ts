@@ -1,7 +1,7 @@
-import { AuthConfiguration } from '@microsoft/agents-hosting';
-import { ConfigValidator, EnvironmentConfigLoader } from '../../config';
-import { IAppConfig, IAzureOpenAIConfig } from '../../interfaces/config';
-import { ILogger } from '../../interfaces/services/logger';
+import { AuthConfiguration } from "@microsoft/agents-hosting";
+import { ConfigValidator, EnvironmentConfigLoader } from "../../config";
+import { IAppConfig, IAzureOpenAIConfig, IOrchestratorConfig } from "../../interfaces/config";
+import { ILogger } from "../../interfaces/services/logger";
 
 export class ConfigurationService {
   private _config?: IAppConfig;
@@ -16,19 +16,19 @@ export class ConfigurationService {
   private get config() {
     if (this._config) return this._config;
 
-    throw new Error('Cannot access config before loading');
+    throw new Error("Cannot access config before loading");
   }
 
   public async load(): Promise<void> {
     try {
       const envConfigLoader = new EnvironmentConfigLoader(this.logger);
       this._config = envConfigLoader.loadConfiguration();
-      this.logger.info('Configuration loaded from environment variables');
+      this.logger.info("Configuration loaded from environment variables");
 
       // Validate the loaded configuration
       this.validator.validateConfiguration(this.config);
     } catch (error) {
-      this.logger.error('Failed to initialize configuration service', error as Error);
+      this.logger.error("Failed to initialize configuration service", error as Error);
       throw error;
     }
   }
@@ -44,6 +44,10 @@ export class ConfigurationService {
     return this.config.azureOpenAI;
   }
 
+  public getOrchestratorConfig(): IOrchestratorConfig {
+    return this.config.orchestrator;
+  }
+
   public getCommandConfig() {
     return this.config.commands;
   }
@@ -57,11 +61,11 @@ export class ConfigurationService {
   }
 
   public isProduction(): boolean {
-    return this.config.environment === 'production';
+    return this.config.environment === "production";
   }
 
   public isDevelopment(): boolean {
-    return this.config.environment === 'development';
+    return this.config.environment === "development";
   }
 
   public getPort(): number {
@@ -76,7 +80,11 @@ export class ConfigurationService {
     return this.config.logging.enableConsole;
   }
 
-  public getAssetsPath(): string {
-    return this.config.assetsPath || 'public';
+  public getAssetsDir(): string {
+    return this.config.assetsDir;
+  }
+
+  public getBasePath(): string {
+    return this.config.basePath;
   }
 }

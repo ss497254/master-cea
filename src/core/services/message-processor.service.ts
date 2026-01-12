@@ -8,24 +8,25 @@ import {
   TurnContext,
   UserState,
   type Request,
-} from '@microsoft/agents-hosting';
-import { type Response } from 'express';
-import { StorageConfig } from 'src/interfaces';
-import { createAdapter } from '../../adapter';
-import { AIHandler, DemoHandler, EchoHandler } from '../../bot/activity-handlers';
-import { HelpCommand, ListModeCommand, MenuCommand, SetModeCommand } from '../../commands';
-import { GetModeCommand } from '../../commands/get-mode';
-import { USER_MODE_STATE_KEY } from '../../config/constants';
-import { ILogger } from '../../interfaces/services/logger';
-import { getMessageTextFromActivity } from '../../utils/helpers';
-import { CommandExecutor, CommandParser } from '../commands';
-import { ConfigurationService } from './configuration-service';
-import { EchoActivityHandler } from 'src/bot/activity-handlers/echo-activity';
+} from "@microsoft/agents-hosting";
+import { type Response } from "express";
+import { StorageConfig } from "src/interfaces";
+import { createAdapter } from "../../adapter";
+import { getActivityHandlers } from "../../bot/activity-handlers";
+import { HelpCommand, ListModeCommand, MenuCommand, SetModeCommand } from "../../commands";
+import { GetModeCommand } from "../../commands/get-mode";
+import { USER_MODE_STATE_KEY } from "../../config/constants";
+import { ILogger } from "../../interfaces/services/logger";
+import { getMessageTextFromActivity } from "../../utils/helpers";
+import { CommandExecutor, CommandParser } from "../commands";
+import { ConfigurationService } from "./configuration-service";
+import { OrchestratorService } from "./orchestrator.service";
 
 export class MessageProcessorService {
   private adapter: CloudAdapter;
   private commandParser: CommandParser;
   private commandExecutor: CommandExecutor;
+  private orchestrator: OrchestratorService;
   private handlers: Record<string, ActivityHandler>;
   private storage: Storage;
   private conversationState: ConversationState;
@@ -42,12 +43,14 @@ export class MessageProcessorService {
     this.conversationState = new ConversationState(this.storage);
     this.userState = new UserState(this.storage);
 
-    this.handlers = {
-      echo: new EchoHandler(),
-      'echo-activity': new EchoActivityHandler(),
-      demo: new DemoHandler(config.getBotConfig(), this.logger),
-      ai: new AIHandler(config.getAzureOpenAIConfig(), this.logger),
-    };
+    this.orchestrator = new OrchestratorService(
+      config.getAzureOpenAIConfig(),
+      config.getOrchestratorConfig(),
+      this.userState,
+      this.logger
+    );
+
+    this.handlers = getActivityHandlers(this.config, this.logger);
 
     this.registerCommands();
   }
@@ -74,24 +77,41 @@ export class MessageProcessorService {
         await context.sendActivity(`❓ Sorry, I couldn't parse that command.`);
       }
     } else {
-      const handler = await this.getHandler(context);
+      const handler = await this.getHandler(context, message || "");
       await handler.run(context);
     }
   }
 
-  private async getHandler(context: TurnContext): Promise<ActivityHandler> {
+  private async getHandler(context: TurnContext, message: string): Promise<ActivityHandler> {
+    // Check if user has explicitly set a mode
     const userModeAccessor = this.userState.createProperty<string>(USER_MODE_STATE_KEY);
-    const mode = await userModeAccessor.get(context);
+    const userMode = await userModeAccessor.get(context);
 
-    if (!!mode && mode in this.handlers) {
-      return this.handlers[mode];
-    } else {
-      return this.handlers.demo; // default handler
+    // If user has set a mode, use it (overrides orchestrator)
+    if (userMode && userMode in this.handlers) {
+      return this.handlers[userMode];
     }
+
+    // Use orchestrator if enabled
+    if (this.orchestrator.isEnabled() && message) {
+      const decision = await this.orchestrator.route(message, context);
+      this.logger.debug("Orchestrator routing", {
+        handler: decision.handler,
+        capability: decision.capability,
+        cached: decision.cached,
+      });
+
+      if (decision.handler in this.handlers) {
+        return this.handlers[decision.handler];
+      }
+    }
+
+    // Default to AI handler
+    return this.handlers.ai;
   }
 
   private createStorage(config: StorageConfig): Storage {
-    if (config.type === 'file') {
+    if (config.type === "file") {
       return new FileStorage(config.filePath);
     }
 

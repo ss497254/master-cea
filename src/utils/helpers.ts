@@ -1,5 +1,5 @@
-import { Activity, ActivityTypes } from '@microsoft/agents-activity';
-import { TurnContext } from '@microsoft/agents-hosting';
+import { Activity, ActivityTypes } from "@microsoft/agents-activity";
+import { TurnContext } from "@microsoft/agents-hosting";
 
 export function getMessageTextFromActivity(activity: Activity): string | undefined {
   if (Activity.fromObject(activity).type === ActivityTypes.Message) {
@@ -12,7 +12,7 @@ export function sendCard(context: TurnContext, card: object) {
     type: ActivityTypes.Message,
     attachments: [
       {
-        contentType: 'application/vnd.microsoft.card.adaptive',
+        contentType: "application/vnd.microsoft.card.adaptive",
         content: card,
       },
     ],
@@ -24,9 +24,9 @@ export function sendActivity(context: TurnContext, activity: object) {
 }
 
 export function isMessageActivityForRoute(activity: Activity, keyword: string | RegExp): boolean {
-  const messageText = getMessageTextFromActivity(activity) || '';
+  const messageText = getMessageTextFromActivity(activity) || "";
 
-  if (typeof keyword === 'string') {
+  if (typeof keyword === "string") {
     return messageText.toLowerCase().includes(keyword.toLowerCase());
   } else if (keyword instanceof RegExp) {
     return keyword.test(messageText);

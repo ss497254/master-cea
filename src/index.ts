@@ -1,10 +1,10 @@
-import 'reflect-metadata';
-import { container } from 'tsyringe';
-import type { Server } from 'http';
-import express from 'express';
-import { ConfigurationService, LoggerService } from './core/services';
-import { registerServices } from './core/bootstrap/services';
-import { createExpressRouter } from './routes';
+import "reflect-metadata";
+import { container } from "tsyringe";
+import type { Server } from "http";
+import express from "express";
+import { ConfigurationService, LoggerService } from "./core/services";
+import { registerServices } from "./core/bootstrap/services";
+import { createExpressRouter } from "./routes";
 
 async function startApplication(): Promise<void> {
   try {
@@ -21,19 +21,19 @@ async function startApplication(): Promise<void> {
 
     const app = express();
     app.use(config.getBasePath(), createExpressRouter());
-    app.disable('x-powered-by');
+    app.disable("x-powered-by");
 
     const server: Server = app.listen(port, error => {
       if (error) {
-        logger.error('Error starting server: ' + error.message);
+        logger.error("Error starting server: " + error.message);
       } else {
         logger.info(`🌐 Server listening on port ${port}`);
       }
     });
-    logger.info('Starting MasterCEA in ' + process.env.NODE_ENV);
+    logger.info("Starting MasterCEA in " + process.env.NODE_ENV);
 
     // The server is already listening since startServer handles that
-    logger.info('MasterCEA started successfully', {
+    logger.info("MasterCEA started successfully", {
       port,
       environment: config.getConfig().environment,
       endpoints: {
@@ -42,7 +42,7 @@ async function startApplication(): Promise<void> {
       },
     });
 
-    logger.info('🤖 MasterCEA - Ready!');
+    logger.info("🤖 MasterCEA - Ready!");
 
     // Graceful shutdown
     const shutdown = async (signal: string) => {
@@ -50,35 +50,35 @@ async function startApplication(): Promise<void> {
       container.dispose();
       server.close(err => {
         if (err) {
-          logger.error('Error closing server:', err);
+          logger.error("Error closing server:", err);
         } else {
-          logger.info('Server closed gracefully');
+          logger.info("Server closed gracefully");
         }
         process.exit(0);
       });
     };
 
-    process.on('SIGTERM', () => shutdown('SIGTERM'));
-    process.on('SIGINT', () => shutdown('SIGINT'));
+    process.on("SIGTERM", () => shutdown("SIGTERM"));
+    process.on("SIGINT", () => shutdown("SIGINT"));
   } catch (error) {
-    console.error('Failed to start application:', error);
+    console.error("Failed to start application:", error);
     process.exit(1);
   }
 }
 
 // Global error handlers
-process.on('uncaughtException', error => {
-  console.error('Uncaught Exception:', error);
+process.on("uncaughtException", error => {
+  console.error("Uncaught Exception:", error);
   process.exit(1);
 });
 
-process.on('unhandledRejection', (reason, promise) => {
-  console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+process.on("unhandledRejection", (reason, promise) => {
+  console.error("Unhandled Rejection at:", promise, "reason:", reason);
   process.exit(1);
 });
 
 // Start the application
 startApplication().catch(error => {
-  console.error('Application startup failed:', error);
+  console.error("Application startup failed:", error);
   process.exit(1);
 });

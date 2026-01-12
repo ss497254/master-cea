@@ -2,7 +2,7 @@
  * Configuration interfaces for the application
  */
 
-import { AuthConfiguration } from '@microsoft/agents-hosting';
+import { AuthConfiguration } from "@microsoft/agents-hosting";
 
 export interface IAzureOpenAIConfig {
   apiKey: string;
@@ -14,7 +14,7 @@ export interface IAzureOpenAIConfig {
 }
 
 export interface ILoggingConfig {
-  level: 'debug' | 'info' | 'warn' | 'error';
+  level: "debug" | "info" | "warn" | "error";
   enableConsole: boolean;
   enableFileLogging?: boolean;
 }
@@ -26,19 +26,19 @@ export interface ICommandConfig {
 
 export type StorageConfig =
   | {
-      type: 'memory';
+      type: "memory";
     }
   | {
-      type: 'file';
+      type: "file";
       filePath: string;
     }
   | {
-      type: 'blob';
+      type: "blob";
       containerId: string;
       connectionString: string;
     }
   | {
-      type: 'cosmosdb';
+      type: "cosmosdb";
       databaseId: string;
       containerId: string;
       cosmosClientOptions: {
@@ -60,11 +60,11 @@ export interface IAppConfig {
   logging: ILoggingConfig;
   storage: StorageConfig;
   commands: ICommandConfig;
-  environment: 'development' | 'production' | 'staging';
+  environment: "development" | "production" | "staging";
   port: number;
   assetsDir: string;
   basePath: string;
 }
 
 // Configuration loader interface
-export { IConfigLoader } from './config-loader';
+export { IConfigLoader } from "./config-loader";

@@ -36,10 +36,7 @@ export class ConfigValidator {
     return result;
   }
 
-  private validateAzureOpenAIConfig(
-    config: IAzureOpenAIConfig,
-    result: ValidationResult,
-  ): void {
+  private validateAzureOpenAIConfig(config: IAzureOpenAIConfig, result: ValidationResult): void {
     if (!config.apiKey) {
       result.errors.push("Azure OpenAI API Key is required");
     }
@@ -53,28 +50,19 @@ export class ConfigValidator {
     }
 
     if (config.maxTokens <= 0 || config.maxTokens > 32000) {
-      result.warnings.push(
-        "Azure OpenAI max tokens should be between 1 and 32000",
-      );
+      result.warnings.push("Azure OpenAI max tokens should be between 1 and 32000");
     }
 
     if (config.temperature < 0 || config.temperature > 2) {
-      result.warnings.push(
-        "Azure OpenAI temperature should be between 0 and 2",
-      );
+      result.warnings.push("Azure OpenAI temperature should be between 0 and 2");
     }
 
     if (!config.deploymentName) {
-      result.warnings.push(
-        "Azure OpenAI deployment name not specified, using default: gpt-4",
-      );
+      result.warnings.push("Azure OpenAI deployment name not specified, using default: gpt-4");
     }
   }
 
-  private validateBotConfig(
-    config: AuthConfiguration,
-    result: ValidationResult,
-  ): void {
+  private validateBotConfig(config: AuthConfiguration, result: ValidationResult): void {
     if (!config.clientId) {
       result.errors.push("Bot client ID is required");
     }
@@ -90,9 +78,7 @@ export class ConfigValidator {
     }
 
     if (port < 1024) {
-      result.warnings.push(
-        "Port is below 1024 - may require elevated privileges on some systems",
-      );
+      result.warnings.push("Port is below 1024 - may require elevated privileges on some systems");
     }
   }
 
@@ -107,13 +93,13 @@ export class ConfigValidator {
 
   private logValidationResults(result: ValidationResult): void {
     if (result.errors.length > 0) {
-      result.errors.forEach((error) => {
+      result.errors.forEach(error => {
         this.logger.error(`Configuration validation error: ${error}`);
       });
     }
 
     if (result.warnings.length > 0) {
-      result.warnings.forEach((warning) => {
+      result.warnings.forEach(warning => {
         this.logger.warn(`Configuration validation warning: ${warning}`);
       });
     }

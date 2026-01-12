@@ -73,9 +73,9 @@ export class MyHandler extends ActivityHandler {
 
 ```typescript
 export class MyCommand extends Command {
-  name = 'mycommand';
-  description = 'Description';
-  args = [{ name: 'arg1', required: true }];
+  name = "mycommand";
+  description = "Description";
+  args = [{ name: "arg1", required: true }];
 
   canExecute(request: CommandRequest) {
     return true;
@@ -90,7 +90,7 @@ export class MyCommand extends Command {
 
 ```typescript
 context.streamingResponse.queueTextChunk(text);
-context.streamingResponse.queueInformativeUpdate('status');
+context.streamingResponse.queueInformativeUpdate("status");
 await context.streamingResponse.endStream();
 ```
 

@@ -1,11 +1,6 @@
 import { AuthConfiguration } from "@microsoft/agents-hosting";
 import dotenv from "dotenv";
-import {
-  IAppConfig,
-  IAzureOpenAIConfig,
-  IConfigLoader,
-  IOrchestratorConfig,
-} from "../interfaces";
+import { IAppConfig, IAzureOpenAIConfig, IConfigLoader, IOrchestratorConfig } from "../interfaces";
 import { ILogger } from "../interfaces/services/logger";
 
 export class EnvironmentConfigLoader extends IConfigLoader {
@@ -39,15 +34,11 @@ export class EnvironmentConfigLoader extends IConfigLoader {
   }
 
   private getEnvironment(): "development" | "production" | "staging" {
-    return (
-      (process.env.NODE_ENV as "development" | "production" | "staging") ||
-      "development"
-    );
+    return (process.env.NODE_ENV as "development" | "production" | "staging") || "development";
   }
 
   private loadBotConfig(): AuthConfiguration {
-    const authority =
-      process.env.AUTHORITY || "https://login.microsoftonline.com";
+    const authority = process.env.AUTHORITY || "https://login.microsoftonline.com";
 
     return {
       clientId: process.env.BOT_ID || "",
@@ -83,9 +74,7 @@ export class EnvironmentConfigLoader extends IConfigLoader {
 
   private loadLoggingConfig() {
     return {
-      level:
-        (process.env.LOG_LEVEL as "debug" | "info" | "warn" | "error") ||
-        "info",
+      level: (process.env.LOG_LEVEL as "debug" | "info" | "warn" | "error") || "info",
       enableConsole: process.env.ENABLE_CONSOLE_LOGGING !== "false",
     };
   }
@@ -124,9 +113,7 @@ export class EnvironmentConfigLoader extends IConfigLoader {
           },
         } as const;
       default:
-        this.logger.warn(
-          `Unknown STORAGE_TYPE "${type}", defaulting to memory storage.`,
-        );
+        this.logger.warn(`Unknown STORAGE_TYPE "${type}", defaulting to memory storage.`);
         return { type: "memory" } as const;
     }
   }
