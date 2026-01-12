@@ -1,9 +1,10 @@
 import 'reflect-metadata';
 import { container } from 'tsyringe';
 import type { Server } from 'http';
-import { createExpressApp } from './server';
+import express from 'express';
 import { ConfigurationService, LoggerService } from './core/services';
 import { registerServices } from './core/bootstrap/services';
+import { createExpressRouter } from './routes';
 
 async function startApplication(): Promise<void> {
   try {
@@ -16,9 +17,10 @@ async function startApplication(): Promise<void> {
 
     await config.load();
 
-    const app = createExpressApp();
     const port = config.getPort();
 
+    const app = express();
+    app.use(config.getBasePath(), createExpressRouter());
     app.disable('x-powered-by');
 
     const server: Server = app.listen(port, error => {
@@ -46,7 +48,7 @@ async function startApplication(): Promise<void> {
     const shutdown = async (signal: string) => {
       logger.info(`Received ${signal}, shutting down gracefully`);
       container.dispose();
-      server.close((err) => {
+      server.close(err => {
         if (err) {
           logger.error('Error closing server:', err);
         } else {
