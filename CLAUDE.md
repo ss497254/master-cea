@@ -23,6 +23,7 @@ bun run lint:fix     # ESLint with auto-fix
 ## Architecture
 
 ### Request Flow
+
 ```
 HTTP Request → Express Router → JWT Auth → Message Processor → Activity Handler → Command Executor (if command) → Response
 ```
@@ -39,6 +40,7 @@ HTTP Request → Express Router → JWT Auth → Message Processor → Activity 
 ### Dependency Injection (TSyringe)
 
 Services registered in `src/core/bootstrap/services.ts`:
+
 ```typescript
 container.register<LoggerService>(LoggerService, { useValue: logger });
 const logger = container.resolve<LoggerService>(LoggerService);
@@ -47,16 +49,20 @@ const logger = container.resolve<LoggerService>(LoggerService);
 ### Adding New Commands
 
 1. Create file in `src/commands/`:
+
 ```typescript
 export class MyCommand extends Command {
-  name = 'mycommand';
-  description = 'Description';
-  args = [{ name: 'arg1', required: true }];
+  name = "mycommand";
+  description = "Description";
+  args = [{ name: "arg1", required: true }];
 
-  canExecute(request: CommandRequest) { return true; }
-  async execute(request: CommandRequest, context: TurnContext) { }
+  canExecute(request: CommandRequest) {
+    return true;
+  }
+  async execute(request: CommandRequest, context: TurnContext) {}
 }
 ```
+
 2. Register in `src/commands/index.ts`
 
 ### Adding New Activity Handlers
@@ -69,7 +75,7 @@ export class MyCommand extends Command {
 
 ```typescript
 context.streamingResponse.queueTextChunk(text);
-context.streamingResponse.queueInformativeUpdate('thinking...');
+context.streamingResponse.queueInformativeUpdate("thinking...");
 await context.streamingResponse.endStream();
 ```
 
@@ -78,11 +84,12 @@ await context.streamingResponse.endStream();
 - Environment config loaded via `src/config/env-config-loader.ts`
 - Validation in `src/config/config-validator.ts`
 - `.env` only loaded in non-production environments
-- Required: BOT_ID, TENANT_ID, BOT_PASSWORD, AZURE_OPENAI_* vars
+- Required: BOT*ID, TENANT_ID, BOT_PASSWORD, AZURE_OPENAI*\* vars
 
 ## Code Conventions
 
 See `docs/code-conventions.md` for full details:
+
 - Max 500 lines per file (break up at 400)
 - Functions under 30-40 lines
 - Single responsibility per file/class
