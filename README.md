@@ -174,12 +174,14 @@ bun run debug
 ### Environment Variables
 
 #### Bot Authentication
+
 - `BOT_ID`: Microsoft Bot Framework application ID
 - `TENANT_ID`: Azure AD tenant ID
 - `BOT_PASSWORD`: Bot application secret
 - `AUTHORITY`: OAuth authority (default: `https://login.microsoftonline.com`)
 
 #### Azure OpenAI
+
 - `AZURE_OPENAI_API_KEY`: Azure OpenAI API key (required)
 - `AZURE_OPENAI_ENDPOINT`: Azure OpenAI endpoint URL (required)
 - `AZURE_OPENAI_DEPLOYMENT_NAME`: Model deployment name (default: `gpt-4`)
@@ -188,31 +190,37 @@ bun run debug
 - `AZURE_OPENAI_TEMPERATURE`: Temperature setting (default: `0.7`)
 
 #### Server
+
 - `PORT`: Server port (default: `8080`)
 - `NODE_ENV`: Environment (`development`, `staging`, `production`)
 
 #### Logging
+
 - `LOG_LEVEL`: Log level (`debug`, `info`, `warn`, `error`, default: `info`)
 - `ENABLE_CONSOLE_LOGGING`: Enable console output (default: `true`)
 
 #### Commands
+
 - `ENABLE_COMMANDS`: Enable command system (default: `false`)
 - `COMMAND_PREFIX`: Command prefix character (default: `-`)
 
 #### Storage
 
 **Memory Storage** (default):
+
 ```bash
 STORAGE_TYPE=memory
 ```
 
 **File Storage**:
+
 ```bash
 STORAGE_TYPE=file
 STORAGE_FOLDER_PATH=./bot-storage
 ```
 
 **Azure Blob Storage**:
+
 ```bash
 STORAGE_TYPE=blob
 BLOB_CONTAINER_ID=bot-container
@@ -220,6 +228,7 @@ BLOB_CONNECTION_STRING=your-connection-string
 ```
 
 **CosmosDB Storage**:
+
 ```bash
 STORAGE_TYPE=cosmosdb
 COSMOSDB_DATABASE_ID=BotDatabase
@@ -271,14 +280,15 @@ bun run deploy           # Build and deploy
 ### Adding New Activity Handlers
 
 1. Create a new handler class in `src/bot/activity-handlers/`:
+
 ```typescript
-import { ActivityHandler, TurnContext } from '@microsoft/agents-hosting';
+import { ActivityHandler, TurnContext } from "@microsoft/agents-hosting";
 
 export class MyHandler extends ActivityHandler {
   constructor() {
     super();
     this.onMessage(async (context, next) => {
-      await context.sendActivity('Hello from MyHandler!');
+      await context.sendActivity("Hello from MyHandler!");
       await next();
     });
   }
@@ -291,17 +301,18 @@ export class MyHandler extends ActivityHandler {
 ### Adding New Commands
 
 1. Create command file in `src/commands/`:
+
 ```typescript
-import { Command } from '../core/commands/command';
-import { CommandRequest, TurnContext } from '../interfaces';
+import { Command } from "../core/commands/command";
+import { CommandRequest, TurnContext } from "../interfaces";
 
 export class MyCommand extends Command {
-  name = 'mycommand';
-  description = 'Does something cool';
+  name = "mycommand";
+  description = "Does something cool";
   args = [];
 
   async execute(request: CommandRequest, context: TurnContext) {
-    await context.sendActivity('Command executed!');
+    await context.sendActivity("Command executed!");
   }
 }
 ```
@@ -323,6 +334,7 @@ Activity handlers extend `ActivityHandler` from `@microsoft/agents-hosting` and 
 ### Command System
 
 Commands are executed when users type messages starting with the command prefix (default: `-`). Commands support:
+
 - **Named arguments**: `-command --arg value`
 - **Positional arguments**: `-command value1 value2`
 - **Required/optional arguments**
@@ -331,9 +343,10 @@ Commands are executed when users type messages starting with the command prefix 
 ### Streaming Responses
 
 The AI handler uses streaming responses for real-time text generation:
+
 ```typescript
 context.streamingResponse.queueTextChunk(text);
-context.streamingResponse.queueInformativeUpdate('thinking...');
+context.streamingResponse.queueInformativeUpdate("thinking...");
 await context.streamingResponse.endStream();
 ```
 
@@ -380,6 +393,7 @@ This sets `NODE_ENV=production` and creates an optimized build in `dist/`.
 ### Deploy Script
 
 The project includes a deployment script (`scripts/deploy.js`) that:
+
 1. Builds the project
 2. Sets up deployment directory
 3. Copies necessary files
@@ -400,6 +414,7 @@ bun run deploy
 ### Teams App Package
 
 The `appPackage/` directory contains:
+
 - `manifest.json`: Teams app manifest
 - `color.png`: App icon (color)
 - `outline.png`: App icon (outline)
@@ -411,21 +426,25 @@ Upload this package to Teams to install the bot.
 ### Common Issues
 
 **Bot not responding:**
+
 - Check `BOT_ID`, `TENANT_ID`, and `BOT_PASSWORD` are correct
 - Verify the bot is registered in Azure Portal
 - Check network connectivity to Azure services
 
 **Azure OpenAI errors:**
+
 - Verify `AZURE_OPENAI_API_KEY` and `AZURE_OPENAI_ENDPOINT`
 - Check deployment name matches `AZURE_OPENAI_DEPLOYMENT_NAME`
 - Ensure API version is supported
 
 **Configuration errors:**
+
 - Check all required environment variables are set
 - Review logs for validation errors
 - Ensure `.env` file is in project root (development only)
 
 **Build errors:**
+
 - Run `bun install` to ensure dependencies are installed
 - Check TypeScript errors: `bun run lint`
 - Clear `dist/` and rebuild: `bun run clean && bun run build`
@@ -435,7 +454,7 @@ Upload this package to Teams to install the bot.
 1. **Enable debug logging**: Set `LOG_LEVEL=debug` in `.env`
 2. **Use debug mode**: `bun run debug` and attach Node.js inspector
 3. **Check logs**: Review console output for error messages
-4. **Test endpoints**: 
+4. **Test endpoints**:
    - Health: `http://localhost:8080/`
    - Messages: `http://localhost:8080/api/messages` (requires auth)
 
