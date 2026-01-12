@@ -3,6 +3,7 @@
 ## Architecture Overview
 
 Microsoft 365 AI Agent built with:
+
 - **Runtime**: Bun with TypeScript, Express.js server
 - **M365 SDK**: `@microsoft/agents-hosting` for bot framework integration
 - **AI**: Azure OpenAI via `@ai-sdk/azure` with streaming responses
@@ -12,28 +13,33 @@ Microsoft 365 AI Agent built with:
 ## Key Files
 
 ### Entry Points
+
 - `src/index.ts` - Application bootstrap and startup
 - `src/server.ts` - Express server configuration
 - `src/routes/messages.ts` - Bot message endpoint handler
 
 ### Core Services
+
 - `src/core/services/configuration-service.ts` - Configuration management
 - `src/core/services/logger-service.ts` - Logging service
 - `src/core/services/message-processor.service.ts` - Routes messages to handlers
 - `src/core/bootstrap/services.ts` - Service registration
 
 ### Bot Handlers
+
 - `src/bot/activity-handlers/ai.ts` - AI-powered handler (main)
 - `src/bot/activity-handlers/echo.ts` - Echo handler
 - `src/bot/activity-handlers/demo.ts` - Demo handler
 - `src/bot/activity-handlers/index.ts` - Handler registration
 
 ### Command System
+
 - `src/core/commands/command-executor.ts` - Executes commands
 - `src/core/commands/command-parser.ts` - Parses command strings
 - `src/commands/` - User-facing commands
 
 ### Configuration
+
 - `src/config/env-config-loader.ts` - Loads from environment variables
 - `src/config/config-validator.ts` - Validates configuration
 
@@ -71,7 +77,9 @@ export class MyCommand extends Command {
   description = 'Description';
   args = [{ name: 'arg1', required: true }];
 
-  canExecute(request: CommandRequest) { return true; }
+  canExecute(request: CommandRequest) {
+    return true;
+  }
   async execute(request: CommandRequest, context: TurnContext) {
     // Command logic
   }
@@ -89,6 +97,7 @@ await context.streamingResponse.endStream();
 ## Common Tasks
 
 ### Adding a New Feature
+
 1. Identify the layer: Handler, Command, Service, or Route
 2. Use dependency injection via TSyringe
 3. Follow existing patterns
@@ -96,12 +105,15 @@ await context.streamingResponse.endStream();
 5. Register in appropriate index files
 
 ### Adding Environment Variables
+
 1. Add to `src/config/env-config-loader.ts`
 2. Add to `src/interfaces/config/index.ts` if needed
 3. Add to `.env.example`
 
 ### Modifying AI Behavior
+
 Edit `src/bot/activity-handlers/ai.ts`:
+
 - `SYSTEM_PROMPT` - AI personality and behavior
 - `handleMessage()` - Message processing logic
 
