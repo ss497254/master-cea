@@ -13,7 +13,7 @@ export class SetModeCommand extends Command {
     ]);
   }
 
-  canExecute(request: CommandRequest): boolean | Promise<boolean> {
+  canExecute(_request: CommandRequest): boolean | Promise<boolean> {
     // TODO: add permission check
     return true;
   }

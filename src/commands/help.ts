@@ -8,7 +8,7 @@ export class HelpCommand extends Command {
     super('help', 'Show the help menu');
   }
 
-  canExecute(request: CommandRequest): boolean | Promise<boolean> {
+  canExecute(_request: CommandRequest): boolean | Promise<boolean> {
     return true;
   }
 

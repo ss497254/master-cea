@@ -7,7 +7,7 @@ export class MenuCommand extends Command {
     super('menu', 'Show the menu');
   }
 
-  canExecute(request: CommandRequest): boolean | Promise<boolean> {
+  canExecute(_request: CommandRequest): boolean | Promise<boolean> {
     return true;
   }
 

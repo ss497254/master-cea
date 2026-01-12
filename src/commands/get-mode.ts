@@ -8,7 +8,7 @@ export class GetModeCommand extends Command {
     super('get-mode', 'Get the mode');
   }
 
-  canExecute(request: CommandRequest): boolean | Promise<boolean> {
+  canExecute(_request: CommandRequest): boolean | Promise<boolean> {
     // TODO: add permission check
     return true;
   }

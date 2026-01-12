@@ -7,7 +7,7 @@ export class ListModeCommand extends Command {
     super('list-mode', 'List available modes');
   }
 
-  canExecute(request: CommandRequest): boolean | Promise<boolean> {
+  canExecute(_request: CommandRequest): boolean | Promise<boolean> {
     return true;
   }
 
