@@ -36,5 +36,6 @@ export function isMessageActivityForRoute(activity: Activity, keyword: string | 
 }
 
 export function isInvokeActivityForRoute(activity: Activity, name: string): boolean {
-  return Activity.fromObject(activity).name === name;
+  const { name: activityName } = Activity.fromObject(activity);
+  return activityName ? activityName === name : true;
 }

@@ -13,7 +13,7 @@ export const PLAYGROUND_CARD = {
         },
         {
           title: "Adaptive Card - Rendered as an adaptive card",
-          value: "Adaptive Card",
+          value: "AdaptiveCard",
         },
         {
           title: "Activity - Rendered as a full activity",
