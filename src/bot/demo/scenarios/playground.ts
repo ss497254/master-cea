@@ -31,13 +31,27 @@ export const PlaygroundInvokeRoute: BotInvokeRoute = {
     if (payload.type === "Markdown") {
       await sendActivity(context, {
         type: "message",
-        text: `Received playground invoke with data: ${JSON.stringify(payload)}`,
+        text: payload.input,
       });
     } else if (payload.type === "AdaptiveCard") {
-      await sendActivity(context, {
-        type: "message",
-        text: `Playground action received: ${payload.actionName}`,
-      });
+      let card;
+      try {
+        card = JSON.parse(payload.input);
+      } catch (error) {
+        await sendActivity(context, {
+          type: "message",
+          text: `❌ Error parsing Adaptive Card JSON: ${(error as Error).message}`,
+        });
+      }
+
+      try {
+        await sendCard(context, card);
+      } catch (error) {
+        await sendActivity(context, {
+          type: "message",
+          text: `❌ Error sending Adaptive Card: ${(error as Error).message}`,
+        });
+      }
     }
   },
 };

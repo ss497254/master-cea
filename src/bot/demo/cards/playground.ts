@@ -30,7 +30,7 @@ export const PLAYGROUND_CARD = {
       placeholder: "Placeholder text",
       isRequired: true,
       label: "Enter payload below",
-      id: "playgroundPayload",
+      id: "input",
       spacing: "ExtraSmall",
       type: "Input.Text",
       height: "stretch",
