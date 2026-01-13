@@ -29,12 +29,10 @@ export class CommandExecutor {
         );
       }
 
-      // TODO: incorrect logic, fix it later
-      // required args check
+      // Check for missing required arguments
       const missingArgs = cmd.args
-        .filter(arg => arg.required)
-        .map((arg, idx) => (!(request.namedArgs[arg.name] ?? request.args[idx]) ? arg.name : null))
-        .filter(Boolean);
+        .filter((arg, idx) => arg.required && !(request.namedArgs[arg.name] ?? request.args[idx]))
+        .map(arg => arg.name);
 
       if (missingArgs.length > 0) {
         throw new CommandError(`Missing required arguments: ${missingArgs.join(", ")}`);
