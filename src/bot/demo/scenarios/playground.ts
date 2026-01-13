@@ -13,7 +13,6 @@ export const PlaygroundRoute: BotMessageRoute = {
 export const PlaygroundInvokeRoute: BotInvokeRoute = {
   name: "invoke",
   handler: async context => {
-    console.log("Playground invoke payload:", context.activity.value);
     const payload = context.activity.value as any;
 
     if (payload.playground) {
@@ -52,6 +51,11 @@ export const PlaygroundInvokeRoute: BotInvokeRoute = {
           text: `❌ Error sending Adaptive Card: ${(error as Error).message}`,
         });
       }
+    } else if (payload.type === "Activity") {
+      await context.sendActivity(`\
+\`\`\`json
+${JSON.stringify(context.activity, null, 2)}
+\`\`\``);
     }
   },
 };
