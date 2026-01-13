@@ -9,10 +9,10 @@ import { ConfigurationService } from "src/core/services/configuration-service";
 
 export function getActivityHandlers(config: ConfigurationService, logger: ILogger): Record<string, ActivityHandler> {
   return {
-    echo: new EchoHandler(),
-    "echo-activity": new EchoActivityHandler(),
+    echo: new EchoHandler(logger),
+    "echo-activity": new EchoActivityHandler(logger),
     demo: new DemoHandler(config.getBotConfig(), logger),
     ai: new AIHandler(config.getAzureOpenAIConfig(), logger),
-    admin: new AdminHandler(),
+    admin: new AdminHandler(logger),
   };
 }

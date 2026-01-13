@@ -1,10 +1,11 @@
 import { ActivityHandler } from "@microsoft/agents-hosting";
+import { ILogger } from "src/interfaces/services/logger";
 
 export class AdminHandler extends ActivityHandler {
-  constructor() {
+  constructor(private logger: ILogger) {
     super();
     this.onMembersAdded(async (context, next) => {
-      console.log("Members added:", context.activity.membersAdded, context.activity);
+      this.logger.debug("Members added", { members: context.activity.membersAdded });
       const membersAdded = context.activity.membersAdded;
       for (const member of membersAdded!) {
         if (member.id !== context.activity.recipient!.id) {
