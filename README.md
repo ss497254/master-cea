@@ -61,7 +61,7 @@ master-cea/
 │   │       ├── ai.ts           # AI-powered handler (Azure OpenAI)
 │   │       ├── echo.ts         # Echo handler
 │   │       ├── demo.ts         # Demo handler
-│   │       └── pro.ts          # Pro-Bot handler
+│   │       └── admin.ts          # Admin handler
 │   │
 │   ├── commands/                # User-facing commands
 │   │   ├── help.ts             # Help command

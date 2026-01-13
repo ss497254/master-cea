@@ -2,7 +2,7 @@
  * Orchestrator interfaces for AI-based message routing
  */
 
-export type HandlerType = "demo" | "ai" | "pro" | "echo";
+export type HandlerType = "demo" | "ai" | "admin" | "echo";
 
 export interface IRoutingDecision {
   handler: HandlerType;

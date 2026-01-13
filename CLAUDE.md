@@ -32,7 +32,7 @@ HTTP Request → Express Router → JWT Auth → Message Processor → Activity 
 
 - **Entry**: `src/index.ts` bootstraps services and starts server
 - **Server**: `src/server.ts` configures Express routes
-- **Activity Handlers** (`src/bot/activity-handlers/`): Handle different bot modes (AI, Echo, Demo, Pro)
+- **Activity Handlers** (`src/bot/activity-handlers/`): Handle different bot modes (AI, Echo, Demo, Admin)
 - **Commands** (`src/commands/`): User commands like `-help`, `-set-mode`
 - **Core Commands** (`src/core/commands/`): Command base class, parser, and executor
 - **Services** (`src/core/services/`): ConfigurationService, LoggerService, MessageProcessorService

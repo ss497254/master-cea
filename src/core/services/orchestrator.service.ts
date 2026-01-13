@@ -12,13 +12,13 @@ const ROUTING_PROMPT = `You are a message router for a Microsoft Teams bot. Clas
 Available handlers:
 - demo: Help, playground, demos, testing features, simple greetings
 - ai: Open-ended questions, complex reasoning, creative tasks, general knowledge
-- pro: Admin features, privileged operations, settings management
+- admin: Admin features, privileged operations, settings management
 - echo: Simple echo/repeat requests, mirror messages
 
 Capabilities per handler:
 - demo: help, playground, basic, messaging, sensitivity
 - ai: general-qa, creative, analysis, coding
-- pro: admin, settings, analytics
+- admin: admin, settings, analytics
 - echo: repeat
 
 Rules:
@@ -28,7 +28,7 @@ Rules:
 - Default to ai/general-qa if uncertain
 
 Respond with JSON only, no explanation:
-{"handler": "demo|ai|pro|echo", "capability": "string", "confidence": 0.0-1.0}`;
+{"handler": "demo|ai|admin|echo", "capability": "string", "confidence": 0.0-1.0}`;
 
 export class OrchestratorService {
   private azure: AzureOpenAIProvider;
@@ -114,16 +114,17 @@ export class OrchestratorService {
         confidence: parsed.confidence || 0.8,
         cached: false,
       };
-    } catch (parseError) {
+    } catch (error) {
       this.logger.warn("Failed to parse orchestrator response", {
         response: text,
+        error: (error as Error).message,
       });
       return this.getDefaultDecision();
     }
   }
 
   private validateHandler(handler: string): HandlerType {
-    const validHandlers: HandlerType[] = ["demo", "ai", "pro", "echo"];
+    const validHandlers: HandlerType[] = ["demo", "ai", "admin", "echo"];
     if (validHandlers.includes(handler as HandlerType)) {
       return handler as HandlerType;
     }
