@@ -30,16 +30,16 @@ Master CEA is a Microsoft Teams bot that provides AI-powered assistance using Az
 
 ### Core Components
 
-1. **Express Server** (`src/server.ts`): HTTP server with routes for bot messages
+1. **Express Server** (`src/infrastructure/http/`): HTTP server with routes for bot messages
 2. **Activity Handlers** (`src/bot/activity-handlers/`): Handle different types of bot interactions
    - `BaseActivityHandler`: Base class with common handler logic
-3. **Command System** (`src/core/commands/`): Executes user commands with parsing and validation
-4. **Configuration Service** (`src/core/services/configuration.service.ts`): Manages app configuration
-5. **Message Processor** (`src/core/services/message-processor.service.ts`): Composition root for message handling
-   - `HandlerRegistryService`: Handler registration and resolution
+3. **Command System** (`src/domain/commands/`): Executes user commands with parsing and validation
+4. **Configuration Service** (`src/infrastructure/config/configuration.service.ts`): Manages app configuration
+5. **Message Processor** (`src/application/services/message-processor.service.ts`): Composition root for message handling
+   - `HandlerManagerService`: Handler registration and resolution
    - `MessageRouterService`: Routes messages to commands or handlers
    - `StorageFactory`: Creates storage instances
-6. **User Preferences** (`src/core/repositories/user-preferences.repository.ts`): User state management
+6. **User Preferences** (`src/domain/repositories/user-preferences.repository.ts`): User state management
 
 ### Request Flow
 
@@ -50,7 +50,7 @@ HTTP Request → Express Router → JWT Authorization → Message Processor
 
 ### Dependency Injection
 
-The project uses **TSyringe** for dependency injection. Services are registered in `src/core/bootstrap/services.ts` and resolved using the container.
+The project uses **TSyringe** for dependency injection. Services are registered in `src/bootstrap/services.ts` and resolved using the container.
 
 ## Project Structure
 
@@ -58,55 +58,72 @@ The project uses **TSyringe** for dependency injection. Services are registered 
 master-cea/
 ├── src/
 │   ├── index.ts                 # Application entry point
-│   ├── server.ts                # Express server setup
-│   ├── adapter.ts               # Bot adapter configuration
 │   │
-│   ├── bot/                     # Bot-specific code
-│   │   └── activity-handlers/   # Different bot modes/handlers
-│   │       ├── base.handler.ts  # Base class for handlers
-│   │       ├── ai.ts            # AI-powered handler (Azure OpenAI)
-│   │       ├── echo.ts          # Echo handler
-│   │       ├── demo.ts          # Demo handler
-│   │       └── admin.ts         # Admin handler
-│   │
-│   ├── commands/                # User-facing commands
-│   │   ├── help.ts              # Help command
-│   │   ├── set-mode.ts          # Set bot mode
-│   │   ├── get-mode.ts          # Get current mode
-│   │   └── list-mode.ts         # List available modes
-│   │
-│   ├── core/                    # Core application logic
-│   │   ├── bootstrap/           # Service registration
-│   │   ├── commands/            # Command execution system
-│   │   ├── repositories/        # Data access (UserPreferencesRepository)
-│   │   └── services/            # Core services
-│   │       ├── configuration.service.ts
-│   │       ├── logger.service.ts
+│   ├── application/             # Application layer - use cases
+│   │   ├── commands/            # User-facing commands
+│   │   │   ├── menu.ts          # Menu command
+│   │   │   ├── set-mode.ts      # Set bot mode
+│   │   │   ├── get-mode.ts      # Get current mode
+│   │   │   └── list-mode.ts     # List available modes
+│   │   └── services/            # Application services
 │   │       ├── message-processor.service.ts
-│   │       ├── handler-registry.service.ts
-│   │       ├── message-router.service.ts
+│   │       ├── handler-manager.service.ts
+│   │       └── message-router.service.ts
+│   │
+│   ├── domain/                  # Domain layer - business logic
+│   │   ├── commands/            # Command abstractions
+│   │   │   ├── command.ts       # Abstract Command base class
+│   │   │   ├── command-executor.ts
+│   │   │   └── command-parser.ts
+│   │   └── repositories/        # Repository interfaces
+│   │       └── user-preferences.repository.ts
+│   │
+│   ├── infrastructure/          # Infrastructure layer
+│   │   ├── adapter/             # CloudAdapter factory
+│   │   │   └── adapter.factory.ts
+│   │   ├── config/              # Configuration management
+│   │   │   ├── configuration.service.ts
+│   │   │   ├── env-config-loader.ts
+│   │   │   ├── config-validator.ts
+│   │   │   ├── prompts.ts
+│   │   │   ├── constants.ts
+│   │   │   └── runtime-config.ts
+│   │   ├── http/                # Express routes
+│   │   │   └── routes/messages.ts
+│   │   ├── logging/             # Logging service
+│   │   │   └── logger.service.ts
+│   │   └── storage/             # Storage factory
 │   │       └── storage.factory.ts
 │   │
-│   ├── config/                  # Configuration management
-│   │   ├── env-config-loader.ts # Loads config from environment
-│   │   ├── config-validator.ts  # Validates configuration
-│   │   ├── prompts.ts           # Centralized AI system prompts
-│   │   └── constants.ts         # Configuration constants
+│   ├── bot/                     # Bot handlers
+│   │   ├── activity-handlers/   # Activity handler implementations
+│   │   │   ├── base.handler.ts
+│   │   │   ├── echo.handler.ts
+│   │   │   ├── demo.handler.ts
+│   │   │   ├── admin.handler.ts
+│   │   │   └── raw-activity.handler.ts
+│   │   └── main-handler/        # Primary AI handler
+│   │       └── ai.handler.ts
 │   │
-│   ├── shared/                  # Shared code
-│   │   └── interfaces/          # Consolidated TypeScript interfaces
+│   ├── features/                # Feature modules
+│   │   └── demo-scenarios/      # Demo feature
+│   │       ├── cards/           # Adaptive cards
+│   │       └── scenarios/       # Demo scenarios
+│   │
+│   ├── shared/                  # Shared types
+│   │   └── interfaces/          # TypeScript interfaces
 │   │       ├── logger.interface.ts
 │   │       ├── config.interface.ts
 │   │       ├── bot.interface.ts
 │   │       └── orchestrator.interface.ts
 │   │
-│   ├── routes/                  # Express routes
-│   │   └── messages.ts          # Bot message endpoint
+│   ├── utils/                   # Utility functions
+│   │   └── helpers.ts
 │   │
-│   └── utils/                   # Utility functions
+│   └── bootstrap/               # DI container setup
+│       └── services.ts
 │
 ├── appPackage/                  # Teams app package (manifest, icons)
-├── bot-storage/                 # File-based bot state storage
 ├── dist/                        # Compiled JavaScript output
 ├── docs/                        # Documentation
 ├── scripts/                     # Deployment and utility scripts
@@ -233,7 +250,7 @@ STORAGE_TYPE=memory
 
 ```bash
 STORAGE_TYPE=file
-STORAGE_FOLDER_PATH=./bot-storage
+STORAGE_FOLDER_PATH=./.bot-storage
 ```
 
 **Azure Blob Storage**:
@@ -320,15 +337,15 @@ export class MyHandler extends BaseActivityHandler {
 ```
 
 2. Register it in `src/bot/activity-handlers/index.ts`
-3. Add a command to switch to it (see `src/commands/set-mode.ts`)
+3. Add a command to switch to it (see `src/application/commands/set-mode.ts`)
 
 ### Adding New Commands
 
-1. Create command file in `src/commands/`:
+1. Create command file in `src/application/commands/`:
 
 ```typescript
 import { TurnContext } from "@microsoft/agents-hosting";
-import { Command } from "src/core/commands/command";
+import { Command } from "src/domain/commands/command";
 import { CommandRequest } from "src/shared/interfaces";
 
 export class MyCommand extends Command {
@@ -346,7 +363,7 @@ export class MyCommand extends Command {
 }
 ```
 
-2. Register it in `src/commands/index.ts`
+2. Register it in `src/application/commands/index.ts`
 3. The command will be available as `$mycommand` (or your configured prefix)
 
 ## Key Concepts
@@ -354,7 +371,7 @@ export class MyCommand extends Command {
 ### Activity Handlers
 
 Activity handlers extend `ActivityHandler` from `@microsoft/agents-hosting` and respond to bot activities:
-  
+
 - `onMessage`: Handles text messages
 - `onMembersAdded`: Handles when members join
 - `onMessageReaction`: Handles message reactions
@@ -384,7 +401,7 @@ await context.streamingResponse.endStream();
 Services are registered and resolved using TSyringe:
 
 ```typescript
-// Registration (in bootstrap/services.ts)
+// Registration (in src/bootstrap/services.ts)
 container.register<LoggerService>(LoggerService, { useValue: logger });
 
 // Resolution (anywhere)
@@ -395,7 +412,7 @@ const logger = container.resolve<LoggerService>(LoggerService);
 
 ### Custom Storage Backends
 
-Implement a storage adapter by extending the storage configuration in `env-config-loader.ts` and implementing the storage interface.
+Implement a storage adapter by extending the storage configuration in `src/infrastructure/config/env-config-loader.ts` and implementing the storage interface.
 
 ### Custom Configuration Loaders
 
@@ -407,7 +424,7 @@ Implement `ILogger` interface to add custom logging backends (e.g., Application 
 
 ### Middleware
 
-Add Express middleware in `src/server.ts` for cross-cutting concerns (authentication, rate limiting, etc.).
+Add Express middleware in `src/infrastructure/http/index.ts` for cross-cutting concerns (authentication, rate limiting, etc.).
 
 ## Deployment
 

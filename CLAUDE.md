@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Microsoft Teams bot built with Microsoft 365 Agents SDK, Azure OpenAI integration, and TSyringe dependency injection. Uses Bun runtime with Express.js server.
+Multi-platform bot built with Clean Architecture, Azure OpenAI integration, and TSyringe dependency injection. Currently supports Microsoft Teams via Microsoft 365 Agents SDK. Uses Bun runtime with Express.js server.
 
 ## Build & Development Commands
 
@@ -22,33 +22,113 @@ bun run lint:fix     # ESLint with auto-fix
 
 ## Architecture
 
+### Directory Structure (Clean Architecture)
+
+```
+src/
+  application/                    # Application layer - use cases & orchestration
+    commands/                     # User-facing command implementations
+    services/                     # Application services
+      message-processor.service.ts  # Composition root for message handling
+      handler-manager.service.ts    # Handler registration and resolution
+      message-router.service.ts     # Routes messages to commands or handlers
+
+  domain/                         # Domain layer - pure business logic
+    commands/                     # Command abstractions
+      command.ts                  # Abstract Command base class
+      command-executor.ts         # Command execution orchestration
+      command-parser.ts           # Input parsing
+    repositories/                 # Repository interfaces and implementations
+      user-preferences.repository.ts
+
+  infrastructure/                 # Infrastructure layer - external concerns
+    adapter/                      # CloudAdapter factory
+      adapter.factory.ts          # Creates CloudAdapter instances
+    config/                       # Configuration loading & validation
+      configuration.service.ts    # App configuration management
+      env-config-loader.ts        # Environment variable loading
+      config-validator.ts         # Configuration validation
+      prompts.ts                  # Centralized AI system prompts
+      constants.ts                # Configuration constants
+      runtime-config.ts           # Runtime configuration
+    http/                         # Express routes
+      routes/messages.ts          # Bot message endpoint
+    logging/                      # Logging infrastructure
+      logger.service.ts           # Structured logging
+    storage/                      # Storage implementations
+      storage.factory.ts          # Creates storage instances
+
+  bot/                            # Bot handlers (Microsoft Teams)
+    activity-handlers/            # Activity handler implementations
+      base.handler.ts             # Base activity handler
+      echo.handler.ts             # Echo handler
+      demo.handler.ts             # Demo handler
+      admin.handler.ts            # Admin handler
+      raw-activity.handler.ts     # Raw activity handler
+    main-handler/                 # Primary AI handler
+      ai.handler.ts               # AI handler with streaming
+
+  features/                       # Feature modules (vertical slices)
+    demo-scenarios/               # Demo feature - self-contained
+      cards/                      # Adaptive cards
+      scenarios/                  # Demo scenarios
+
+  shared/                         # Shared utilities and types
+    interfaces/                   # Consolidated TypeScript interfaces
+
+  utils/                          # Utility functions
+    helpers.ts
+
+  bootstrap/                      # Application bootstrapping
+    services.ts                   # DI container setup
+```
+
 ### Request Flow
 
 ```
-HTTP Request → Express Router → JWT Auth → Message Processor → Activity Handler → Command Executor (if command) → Response
+HTTP Request → Express Router → JWT Auth → MessageProcessor → MessageRouter → Handler/Command → Response
 ```
 
 ### Key Components
 
 - **Entry**: `src/index.ts` bootstraps services and starts server
-- **Server**: `src/server.ts` configures Express routes
-- **Activity Handlers** (`src/bot/activity-handlers/`): Handle different bot modes (AI, Echo, Demo, Admin)
-- **Commands** (`src/commands/`): User commands like `-help`, `-set-mode`
-- **Core Commands** (`src/core/commands/`): Command base class, parser, and executor
-- **Core Services** (`src/core/services/`):
-  - `configuration.service.ts` - App configuration management
-  - `logger.service.ts` - Structured logging
-  - `message-processor.service.ts` - Composition root for message handling
-  - `handler-registry.service.ts` - Handler registration and resolution
-  - `message-router.service.ts` - Routes messages to commands or handlers
-  - `storage.factory.ts` - Creates storage instances
-- **Repositories** (`src/core/repositories/`): `UserPreferencesRepository` for user state
-- **Shared Interfaces** (`src/shared/interfaces/`): Consolidated TypeScript interfaces
-- **Prompts** (`src/config/prompts.ts`): Centralized AI system prompts
+- **Application Layer** (`src/application/`):
+  - `commands/` - User commands like `$menu`, `$set-mode`
+  - `services/` - Message processing, routing, handler manager
+- **Domain Layer** (`src/domain/`):
+  - `commands/` - Command base class, parser, executor
+  - `repositories/` - User preferences repository
+- **Infrastructure Layer** (`src/infrastructure/`):
+  - `adapter/` - CloudAdapter factory
+  - `config/` - Configuration service, validators, prompts
+  - `http/` - Express routes
+  - `logging/` - Logger service
+  - `storage/` - Storage factory
+- **Bot Layer** (`src/bot/`):
+  - `activity-handlers/` - Activity handlers (echo, demo, admin, etc.)
+  - `main-handler/` - AI handler with streaming
+- **Features** (`src/features/`):
+  - `demo-scenarios/` - Demo cards and scenarios
+- **Shared** (`src/shared/interfaces/`): Consolidated TypeScript interfaces
+- **Utils** (`src/utils/`): Utility functions
+
+### Bot Handlers
+
+The `bot/` directory contains bot-specific implementations:
+
+```typescript
+// Import handlers
+import { BaseActivityHandler } from "src/bot/activity-handlers/base.handler";
+import { AIHandler } from "src/bot/main-handler/ai.handler";
+import { getActivityHandlers } from "src/bot/activity-handlers";
+
+// Import adapter factory
+import { createAdapter } from "src/infrastructure/adapter";
+```
 
 ### Dependency Injection (TSyringe)
 
-Services registered in `src/core/bootstrap/services.ts`:
+Services registered in `src/bootstrap/services.ts`:
 
 ```typescript
 container.register<LoggerService>(LoggerService, { useValue: logger });
@@ -57,22 +137,29 @@ const logger = container.resolve<LoggerService>(LoggerService);
 
 ### Adding New Commands
 
-1. Create file in `src/commands/`:
+1. Create file in `src/application/commands/`:
 
 ```typescript
+import { Command } from "src/domain/commands/command";
+import { CommandRequest } from "src/shared/interfaces";
+
 export class MyCommand extends Command {
-  name = "mycommand";
-  description = "Description";
-  args = [{ name: "arg1", required: true }];
+  constructor() {
+    super("mycommand", "Description", [{ name: "arg1", required: true }]);
+  }
 
   canExecute(request: CommandRequest) {
     return true;
   }
-  async execute(request: CommandRequest, context: TurnContext) {}
+
+  async execute(request: CommandRequest, context: TurnContext) {
+    await context.sendActivity("Hello!");
+  }
 }
 ```
 
-2. Register in `src/commands/index.ts`
+2. Export in `src/application/commands/index.ts`
+3. Register in `src/application/services/message-processor.service.ts`
 
 ### Adding New Activity Handlers
 
@@ -107,10 +194,10 @@ await context.streamingResponse.endStream();
 
 ## Configuration
 
-- Environment config loaded via `src/config/env-config-loader.ts`
-- Validation in `src/config/config-validator.ts`
+- Environment config loaded via `src/infrastructure/config/env-config-loader.ts`
+- Validation in `src/infrastructure/config/config-validator.ts`
 - `.env` only loaded in non-production environments
-- Required: BOT*ID, TENANT_ID, BOT_PASSWORD, AZURE_OPENAI*\* vars
+- Required: BOT_ID, TENANT_ID, BOT_PASSWORD, AZURE_OPENAI_* vars
 
 ## Code Conventions
 
@@ -129,16 +216,29 @@ Use `src/` prefix for all imports (TypeScript path alias configured in `tsconfig
 ```typescript
 // Good - use src/ prefix
 import { ILogger } from "src/shared/interfaces";
-import { Command } from "src/core/commands/command";
+import { Command } from "src/domain/commands/command";
+import { ConfigurationService } from "src/infrastructure/config";
+import { AIHandler } from "src/bot/main-handler/ai.handler";
+import { BaseActivityHandler } from "src/bot/activity-handlers/base.handler";
 
-// Avoid - relative imports
+// Avoid - relative imports (except within same layer/module)
 import { ILogger } from "../../shared/interfaces";
 ```
 
 ### File Naming
 
 - Services: `*.service.ts` (e.g., `configuration.service.ts`)
-- Handlers: `*.handler.ts` or descriptive name (e.g., `ai.ts`, `base.handler.ts`)
+- Handlers: `*.handler.ts` or descriptive name (e.g., `ai.handler.ts`, `base.handler.ts`)
 - Repositories: `*.repository.ts`
 - Factories: `*.factory.ts`
 - Interfaces: `*.interface.ts`
+
+### Layer Dependencies
+
+Follow Clean Architecture dependency rules:
+- `application/` → can import from `domain/`, `infrastructure/`, `bot/`, `shared/`
+- `domain/` → can import from `shared/` only (no infrastructure dependencies)
+- `infrastructure/` → can import from `shared/` only
+- `bot/` → can import from `infrastructure/`, `features/`, `shared/`
+- `features/` → can import from `shared/`
+- `shared/` → no imports from other layers

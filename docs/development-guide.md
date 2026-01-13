@@ -2,7 +2,7 @@
 
 ## Architecture Overview
 
-Microsoft 365 AI Agent built with:
+Microsoft 365 AI Agent built with Clean Architecture principles:
 
 - **Runtime**: Bun with TypeScript, Express.js server
 - **M365 SDK**: `@microsoft/agents-hosting` for bot framework integration
@@ -10,38 +10,83 @@ Microsoft 365 AI Agent built with:
 - **DI**: TSyringe container for service management
 - **Build**: ESBuild with source maps
 
+## Directory Structure
+
+```
+src/
+  application/          # Application layer - use cases & orchestration
+    commands/           # User-facing command implementations
+    services/           # Application services (message processing, routing)
+
+  domain/               # Domain layer - pure business logic
+    commands/           # Command abstractions (base class, executor, parser)
+    repositories/       # Repository interfaces and implementations
+
+  infrastructure/       # Infrastructure layer - external concerns
+    adapter/            # CloudAdapter factory
+    config/             # Configuration service, validators, prompts
+    http/               # Express routes (messages, health)
+    logging/            # Logger service
+    storage/            # Storage factory
+
+  bot/                  # Bot handlers
+    activity-handlers/  # Activity handlers (echo, demo, admin)
+    main-handler/       # Primary AI handler
+
+  features/             # Feature modules (vertical slices)
+    demo-scenarios/     # Demo feature (cards, scenarios)
+
+  shared/               # Shared utilities and types
+    interfaces/         # Consolidated TypeScript interfaces
+
+  utils/                # Utility functions
+
+  bootstrap/            # Application bootstrapping
+```
+
 ## Key Files
 
 ### Entry Points
 
 - `src/index.ts` - Application bootstrap and startup
-- `src/server.ts` - Express server configuration
-- `src/routes/messages.ts` - Bot message endpoint handler
+- `src/infrastructure/http/index.ts` - Express router configuration
+- `src/infrastructure/http/routes/messages.ts` - Bot message endpoint handler
 
-### Core Services
+### Application Layer
 
-- `src/core/services/configuration.service.ts` - Configuration management
-- `src/core/services/logger.service.ts` - Logging service
-- `src/core/services/message-processor.service.ts` - Composition root for message handling
-- `src/core/services/handler-registry.service.ts` - Handler registration and resolution
-- `src/core/services/message-router.service.ts` - Routes messages to commands or handlers
-- `src/core/services/storage.factory.ts` - Factory for creating storage instances
-- `src/core/bootstrap/services.ts` - Service registration
+- `src/application/services/message-processor.service.ts` - Composition root for message handling
+- `src/application/services/handler-manager.service.ts` - Handler registration and resolution
+- `src/application/services/message-router.service.ts` - Routes messages to commands or handlers
+- `src/application/commands/` - User-facing commands (menu, set-mode, etc.)
 
-### Repositories
+### Domain Layer
 
-- `src/core/repositories/user-preferences.repository.ts` - User state management (mode preferences)
+- `src/domain/commands/command.ts` - Abstract Command base class
+- `src/domain/commands/command-executor.ts` - Executes commands
+- `src/domain/commands/command-parser.ts` - Parses command strings
+- `src/domain/repositories/user-preferences.repository.ts` - User state management
 
-### Bot Handlers
+### Infrastructure Layer
 
-- `src/bot/activity-handlers/base.handler.ts` - Base class for all handlers
-- `src/bot/activity-handlers/ai.ts` - AI-powered handler (main)
-- `src/bot/activity-handlers/echo.ts` - Echo handler
-- `src/bot/activity-handlers/demo.ts` - Demo handler
-- `src/bot/activity-handlers/admin.ts` - Admin handler
-- `src/bot/activity-handlers/index.ts` - Handler registration
+- `src/infrastructure/adapter/adapter.factory.ts` - CloudAdapter factory
+- `src/infrastructure/config/configuration.service.ts` - Configuration management
+- `src/infrastructure/config/env-config-loader.ts` - Loads from environment variables
+- `src/infrastructure/config/config-validator.ts` - Validates configuration
+- `src/infrastructure/config/prompts.ts` - Centralized AI system prompts
+- `src/infrastructure/http/index.ts` - Express router setup
+- `src/infrastructure/http/routes/messages.ts` - Bot message endpoint
+- `src/infrastructure/logging/logger.service.ts` - Logging service
+- `src/infrastructure/storage/storage.factory.ts` - Factory for creating storage instances
 
-### Shared Interfaces
+### Bot Layer
+
+- `src/bot/activity-handlers/` - Activity handlers
+  - `base.handler.ts` - Base class for activity handlers
+  - `echo.handler.ts`, `demo.handler.ts`, `admin.handler.ts` - Specialized handlers
+  - `raw-activity.handler.ts` - Raw activity handler
+- `src/bot/main-handler/ai.handler.ts` - AI-powered handler with streaming
+
+### Shared
 
 - `src/shared/interfaces/` - Consolidated TypeScript interfaces
   - `logger.interface.ts` - ILogger interface
@@ -49,17 +94,9 @@ Microsoft 365 AI Agent built with:
   - `bot.interface.ts` - Bot-related interfaces
   - `orchestrator.interface.ts` - Orchestrator interfaces
 
-### Command System
+### Bootstrap
 
-- `src/core/commands/command-executor.ts` - Executes commands
-- `src/core/commands/command-parser.ts` - Parses command strings
-- `src/commands/` - User-facing commands
-
-### Configuration
-
-- `src/config/env-config-loader.ts` - Loads from environment variables
-- `src/config/config-validator.ts` - Validates configuration
-- `src/config/prompts.ts` - Centralized AI system prompts
+- `src/bootstrap/services.ts` - DI container service registration
 
 ## Code Patterns
 
@@ -102,7 +139,7 @@ export class MyHandler extends BaseActivityHandler {
 
 ```typescript
 import { TurnContext } from "@microsoft/agents-hosting";
-import { Command } from "src/core/commands/command";
+import { Command } from "src/domain/commands/command";
 import { CommandRequest } from "src/shared/interfaces";
 
 export class MyCommand extends Command {
@@ -130,24 +167,30 @@ await context.streamingResponse.endStream();
 
 ## Common Tasks
 
-### Adding a New Feature
+### Adding a New Command
 
-1. Identify the layer: Handler, Command, Service, or Route
-2. Use dependency injection via TSyringe
-3. Follow existing patterns
-4. Update configuration if needed
-5. Register in appropriate index files
+1. Create file in `src/application/commands/`
+2. Export in `src/application/commands/index.ts`
+3. Register in `src/application/services/message-processor.service.ts`
+
+### Adding a New Handler
+
+1. Create file in `src/bot/activity-handlers/`
+2. Extend `BaseActivityHandler`
+3. Export in `src/bot/activity-handlers/index.ts`
+4. Add to `getActivityHandlers()` factory function
+5. Add handler name to `HandlerName` type
 
 ### Adding Environment Variables
 
-1. Add to `src/config/env-config-loader.ts`
+1. Add to `src/infrastructure/config/env-config-loader.ts`
 2. Add to `src/shared/interfaces/config.interface.ts` if needed
 3. Add to `.env.example`
 
 ### Modifying AI Behavior
 
-- Edit `src/config/prompts.ts` - AI system prompts and personality
-- Edit `src/bot/activity-handlers/ai.ts` - Message processing logic
+- Edit `src/infrastructure/config/prompts.ts` - AI system prompts and personality
+- Edit `src/bot/main-handler/ai.handler.ts` - Message processing logic
 
 ## Build & Run
 
@@ -171,6 +214,16 @@ bun run lint:fix     # ESLint with auto-fix
 - Set `LOG_LEVEL=debug` for verbose logging
 - Use `bun run debug` for Node.js inspector on localhost:9229
 - Source maps enabled for TypeScript debugging
+
+## Layer Dependencies
+
+Follow Clean Architecture dependency rules:
+- `application/` → can import from `domain/`, `infrastructure/`, `bot/`, `shared/`
+- `domain/` → can import from `shared/` only (no infrastructure dependencies)
+- `infrastructure/` → can import from `shared/` only
+- `bot/` → can import from `infrastructure/`, `features/`, `shared/`
+- `features/` → can import from `shared/`
+- `shared/` → no imports from other layers
 
 ## Key Integration Points
 
