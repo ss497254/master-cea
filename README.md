@@ -32,9 +32,14 @@ Master CEA is a Microsoft Teams bot that provides AI-powered assistance using Az
 
 1. **Express Server** (`src/server.ts`): HTTP server with routes for bot messages
 2. **Activity Handlers** (`src/bot/activity-handlers/`): Handle different types of bot interactions
+   - `BaseActivityHandler`: Base class with common handler logic
 3. **Command System** (`src/core/commands/`): Executes user commands with parsing and validation
-4. **Configuration Service** (`src/core/services/configuration-service.ts`): Manages app configuration
-5. **Message Processor** (`src/core/services/message-processor.service.ts`): Processes incoming messages and routes to appropriate handlers
+4. **Configuration Service** (`src/core/services/configuration.service.ts`): Manages app configuration
+5. **Message Processor** (`src/core/services/message-processor.service.ts`): Composition root for message handling
+   - `HandlerRegistryService`: Handler registration and resolution
+   - `MessageRouterService`: Routes messages to commands or handlers
+   - `StorageFactory`: Creates storage instances
+6. **User Preferences** (`src/core/repositories/user-preferences.repository.ts`): User state management
 
 ### Request Flow
 
@@ -58,40 +63,52 @@ master-cea/
 │   │
 │   ├── bot/                     # Bot-specific code
 │   │   └── activity-handlers/   # Different bot modes/handlers
-│   │       ├── ai.ts           # AI-powered handler (Azure OpenAI)
-│   │       ├── echo.ts         # Echo handler
-│   │       ├── demo.ts         # Demo handler
-│   │       └── admin.ts          # Admin handler
+│   │       ├── base.handler.ts  # Base class for handlers
+│   │       ├── ai.ts            # AI-powered handler (Azure OpenAI)
+│   │       ├── echo.ts          # Echo handler
+│   │       ├── demo.ts          # Demo handler
+│   │       └── admin.ts         # Admin handler
 │   │
 │   ├── commands/                # User-facing commands
-│   │   ├── help.ts             # Help command
-│   │   ├── set-mode.ts         # Set bot mode
-│   │   ├── get-mode.ts         # Get current mode
-│   │   └── list-mode.ts        # List available modes
+│   │   ├── help.ts              # Help command
+│   │   ├── set-mode.ts          # Set bot mode
+│   │   ├── get-mode.ts          # Get current mode
+│   │   └── list-mode.ts         # List available modes
 │   │
 │   ├── core/                    # Core application logic
-│   │   ├── bootstrap/          # Service registration
-│   │   ├── commands/           # Command execution system
-│   │   └── services/           # Core services (Config, Logger, MessageProcessor)
+│   │   ├── bootstrap/           # Service registration
+│   │   ├── commands/            # Command execution system
+│   │   ├── repositories/        # Data access (UserPreferencesRepository)
+│   │   └── services/            # Core services
+│   │       ├── configuration.service.ts
+│   │       ├── logger.service.ts
+│   │       ├── message-processor.service.ts
+│   │       ├── handler-registry.service.ts
+│   │       ├── message-router.service.ts
+│   │       └── storage.factory.ts
 │   │
 │   ├── config/                  # Configuration management
-│   │   ├── env-config-loader.ts    # Loads config from environment
-│   │   ├── config-validator.ts     # Validates configuration
-│   │   └── constants.ts            # Configuration constants
+│   │   ├── env-config-loader.ts # Loads config from environment
+│   │   ├── config-validator.ts  # Validates configuration
+│   │   ├── prompts.ts           # Centralized AI system prompts
+│   │   └── constants.ts         # Configuration constants
 │   │
-│   ├── interfaces/              # TypeScript interfaces
-│   │   ├── bot/                # Bot-related interfaces
-│   │   ├── config/             # Configuration interfaces
-│   │   └── services/           # Service interfaces
+│   ├── shared/                  # Shared code
+│   │   └── interfaces/          # Consolidated TypeScript interfaces
+│   │       ├── logger.interface.ts
+│   │       ├── config.interface.ts
+│   │       ├── bot.interface.ts
+│   │       └── orchestrator.interface.ts
 │   │
 │   ├── routes/                  # Express routes
-│   │   └── messages.ts         # Bot message endpoint
+│   │   └── messages.ts          # Bot message endpoint
 │   │
 │   └── utils/                   # Utility functions
 │
 ├── appPackage/                  # Teams app package (manifest, icons)
 ├── bot-storage/                 # File-based bot state storage
 ├── dist/                        # Compiled JavaScript output
+├── docs/                        # Documentation
 ├── scripts/                     # Deployment and utility scripts
 ├── package.json                 # Dependencies and scripts
 ├── tsconfig.json                # TypeScript configuration
@@ -279,18 +296,25 @@ bun run deploy           # Build and deploy
 
 ### Adding New Activity Handlers
 
-1. Create a new handler class in `src/bot/activity-handlers/`:
+1. Create a new handler class extending `BaseActivityHandler` in `src/bot/activity-handlers/`:
 
 ```typescript
-import { ActivityHandler, TurnContext } from "@microsoft/agents-hosting";
+import { TurnContext } from "@microsoft/agents-hosting";
+import { BaseActivityHandler } from "src/bot/activity-handlers/base.handler";
+import { ILogger } from "src/shared/interfaces";
 
-export class MyHandler extends ActivityHandler {
-  constructor() {
-    super();
-    this.onMessage(async (context, next) => {
-      await context.sendActivity("Hello from MyHandler!");
-      await next();
-    });
+export class MyHandler extends BaseActivityHandler {
+  constructor(logger: ILogger) {
+    super("MyHandler", logger);
+  }
+
+  protected async processMessage(context: TurnContext): Promise<void> {
+    await context.sendActivity("Hello from MyHandler!");
+  }
+
+  // Optional: Override welcome message
+  protected getWelcomeMessage(): string {
+    return "Welcome to MyHandler!";
   }
 }
 ```
@@ -303,13 +327,18 @@ export class MyHandler extends ActivityHandler {
 1. Create command file in `src/commands/`:
 
 ```typescript
-import { Command } from "../core/commands/command";
-import { CommandRequest, TurnContext } from "../interfaces";
+import { TurnContext } from "@microsoft/agents-hosting";
+import { Command } from "src/core/commands/command";
+import { CommandRequest } from "src/shared/interfaces";
 
 export class MyCommand extends Command {
-  name = "mycommand";
-  description = "Does something cool";
-  args = [];
+  constructor() {
+    super("mycommand", "Does something cool");
+  }
+
+  canExecute(request: CommandRequest): boolean {
+    return true;
+  }
 
   async execute(request: CommandRequest, context: TurnContext) {
     await context.sendActivity("Command executed!");

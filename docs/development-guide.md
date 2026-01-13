@@ -20,17 +20,34 @@ Microsoft 365 AI Agent built with:
 
 ### Core Services
 
-- `src/core/services/configuration-service.ts` - Configuration management
-- `src/core/services/logger-service.ts` - Logging service
-- `src/core/services/message-processor.service.ts` - Routes messages to handlers
+- `src/core/services/configuration.service.ts` - Configuration management
+- `src/core/services/logger.service.ts` - Logging service
+- `src/core/services/message-processor.service.ts` - Composition root for message handling
+- `src/core/services/handler-registry.service.ts` - Handler registration and resolution
+- `src/core/services/message-router.service.ts` - Routes messages to commands or handlers
+- `src/core/services/storage.factory.ts` - Factory for creating storage instances
 - `src/core/bootstrap/services.ts` - Service registration
+
+### Repositories
+
+- `src/core/repositories/user-preferences.repository.ts` - User state management (mode preferences)
 
 ### Bot Handlers
 
+- `src/bot/activity-handlers/base.handler.ts` - Base class for all handlers
 - `src/bot/activity-handlers/ai.ts` - AI-powered handler (main)
 - `src/bot/activity-handlers/echo.ts` - Echo handler
 - `src/bot/activity-handlers/demo.ts` - Demo handler
+- `src/bot/activity-handlers/admin.ts` - Admin handler
 - `src/bot/activity-handlers/index.ts` - Handler registration
+
+### Shared Interfaces
+
+- `src/shared/interfaces/` - Consolidated TypeScript interfaces
+  - `logger.interface.ts` - ILogger interface
+  - `config.interface.ts` - Configuration interfaces
+  - `bot.interface.ts` - Bot-related interfaces
+  - `orchestrator.interface.ts` - Orchestrator interfaces
 
 ### Command System
 
@@ -42,6 +59,7 @@ Microsoft 365 AI Agent built with:
 
 - `src/config/env-config-loader.ts` - Loads from environment variables
 - `src/config/config-validator.ts` - Validates configuration
+- `src/config/prompts.ts` - Centralized AI system prompts
 
 ## Code Patterns
 
@@ -57,14 +75,25 @@ const service = container.resolve<ServiceType>(ServiceType);
 
 ### Activity Handlers
 
+Extend `BaseActivityHandler` to reduce boilerplate:
+
 ```typescript
-export class MyHandler extends ActivityHandler {
-  constructor() {
-    super();
-    this.onMessage(async (context, next) => {
-      // Handle message
-      await next();
-    });
+import { TurnContext } from "@microsoft/agents-hosting";
+import { BaseActivityHandler } from "src/bot/activity-handlers/base.handler";
+import { ILogger } from "src/shared/interfaces";
+
+export class MyHandler extends BaseActivityHandler {
+  constructor(logger: ILogger) {
+    super("MyHandler", logger);
+  }
+
+  protected async processMessage(context: TurnContext): Promise<void> {
+    await context.sendActivity(`You said: ${context.activity.text}`);
+  }
+
+  // Optional: Override welcome message
+  protected getWelcomeMessage(): string {
+    return "Welcome to MyHandler!";
   }
 }
 ```
@@ -72,16 +101,21 @@ export class MyHandler extends ActivityHandler {
 ### Commands
 
 ```typescript
-export class MyCommand extends Command {
-  name = "mycommand";
-  description = "Description";
-  args = [{ name: "arg1", required: true }];
+import { TurnContext } from "@microsoft/agents-hosting";
+import { Command } from "src/core/commands/command";
+import { CommandRequest } from "src/shared/interfaces";
 
-  canExecute(request: CommandRequest) {
+export class MyCommand extends Command {
+  constructor() {
+    super("mycommand", "Description", [{ name: "arg1", required: true }]);
+  }
+
+  canExecute(request: CommandRequest): boolean {
     return true;
   }
+
   async execute(request: CommandRequest, context: TurnContext) {
-    // Command logic
+    await context.sendActivity(`Arg1: ${request.args[0]}`);
   }
 }
 ```
@@ -107,15 +141,13 @@ await context.streamingResponse.endStream();
 ### Adding Environment Variables
 
 1. Add to `src/config/env-config-loader.ts`
-2. Add to `src/interfaces/config/index.ts` if needed
+2. Add to `src/shared/interfaces/config.interface.ts` if needed
 3. Add to `.env.example`
 
 ### Modifying AI Behavior
 
-Edit `src/bot/activity-handlers/ai.ts`:
-
-- `SYSTEM_PROMPT` - AI personality and behavior
-- `handleMessage()` - Message processing logic
+- Edit `src/config/prompts.ts` - AI system prompts and personality
+- Edit `src/bot/activity-handlers/ai.ts` - Message processing logic
 
 ## Build & Run
 

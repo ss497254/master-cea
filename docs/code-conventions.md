@@ -46,3 +46,37 @@
 
 - Code as if someone else will scale this
 - Include extension points (dependency injection, interfaces) from day one
+
+## Import Convention
+
+Use `src/` prefix for all imports (TypeScript path alias):
+
+```typescript
+// Good
+import { ILogger } from "src/shared/interfaces";
+import { Command } from "src/core/commands/command";
+
+// Avoid
+import { ILogger } from "../../shared/interfaces";
+```
+
+## File Naming Convention
+
+Use descriptive suffixes for file types:
+
+- `*.service.ts` - Services (e.g., `configuration.service.ts`, `logger.service.ts`)
+- `*.handler.ts` - Handlers (e.g., `base.handler.ts`)
+- `*.repository.ts` - Repositories (e.g., `user-preferences.repository.ts`)
+- `*.factory.ts` - Factories (e.g., `storage.factory.ts`)
+- `*.interface.ts` - Interfaces (e.g., `logger.interface.ts`)
+
+## Directory Structure
+
+Organize code by domain/responsibility:
+
+- `src/shared/interfaces/` - Consolidated TypeScript interfaces
+- `src/core/services/` - Core application services
+- `src/core/repositories/` - Data access/state management
+- `src/core/commands/` - Command system infrastructure
+- `src/bot/activity-handlers/` - Bot message handlers
+- `src/config/` - Configuration and prompts

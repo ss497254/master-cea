@@ -35,7 +35,16 @@ HTTP Request → Express Router → JWT Auth → Message Processor → Activity 
 - **Activity Handlers** (`src/bot/activity-handlers/`): Handle different bot modes (AI, Echo, Demo, Admin)
 - **Commands** (`src/commands/`): User commands like `-help`, `-set-mode`
 - **Core Commands** (`src/core/commands/`): Command base class, parser, and executor
-- **Services** (`src/core/services/`): ConfigurationService, LoggerService, MessageProcessorService
+- **Core Services** (`src/core/services/`):
+  - `configuration.service.ts` - App configuration management
+  - `logger.service.ts` - Structured logging
+  - `message-processor.service.ts` - Composition root for message handling
+  - `handler-registry.service.ts` - Handler registration and resolution
+  - `message-router.service.ts` - Routes messages to commands or handlers
+  - `storage.factory.ts` - Creates storage instances
+- **Repositories** (`src/core/repositories/`): `UserPreferencesRepository` for user state
+- **Shared Interfaces** (`src/shared/interfaces/`): Consolidated TypeScript interfaces
+- **Prompts** (`src/config/prompts.ts`): Centralized AI system prompts
 
 ### Dependency Injection (TSyringe)
 
@@ -67,7 +76,24 @@ export class MyCommand extends Command {
 
 ### Adding New Activity Handlers
 
-1. Create handler class extending `ActivityHandler` in `src/bot/activity-handlers/`
+1. Create handler class extending `BaseActivityHandler` in `src/bot/activity-handlers/`:
+
+```typescript
+import { TurnContext } from "@microsoft/agents-hosting";
+import { BaseActivityHandler } from "src/bot/activity-handlers/base.handler";
+import { ILogger } from "src/shared/interfaces";
+
+export class MyHandler extends BaseActivityHandler {
+  constructor(logger: ILogger) {
+    super("MyHandler", logger);
+  }
+
+  protected async processMessage(context: TurnContext): Promise<void> {
+    await context.sendActivity(`You said: ${context.activity.text}`);
+  }
+}
+```
+
 2. Register in `src/bot/activity-handlers/index.ts`
 3. Add command to switch to it (see `set-mode.ts`)
 
@@ -95,3 +121,24 @@ See `docs/code-conventions.md` for full details:
 - Single responsibility per file/class
 - Use ViewModel/Manager/Coordinator patterns
 - Descriptive names (avoid `data`, `info`, `helper`, `temp`)
+
+### Import Convention
+
+Use `src/` prefix for all imports (TypeScript path alias configured in `tsconfig.json`):
+
+```typescript
+// Good - use src/ prefix
+import { ILogger } from "src/shared/interfaces";
+import { Command } from "src/core/commands/command";
+
+// Avoid - relative imports
+import { ILogger } from "../../shared/interfaces";
+```
+
+### File Naming
+
+- Services: `*.service.ts` (e.g., `configuration.service.ts`)
+- Handlers: `*.handler.ts` or descriptive name (e.g., `ai.ts`, `base.handler.ts`)
+- Repositories: `*.repository.ts`
+- Factories: `*.factory.ts`
+- Interfaces: `*.interface.ts`
