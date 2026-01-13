@@ -1,0 +1,44 @@
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      html,
+      body {
+        padding: 0px;
+        margin: 0px;
+        width: 100%;
+        height: 100%;
+      }
+
+      button {
+        color: white;
+        padding: 10px;
+        margin: 10px;
+        border: 0px;
+        border-radius: 4px;
+      }
+    </style>
+    <script src="https://res.cdn.office.net/teams-js/2.22.0/js/MicrosoftTeams.min.js"></script>
+
+    <script>
+      microsoftTeams.app.initialize().then(() => {
+        document.body.innerHTML = `
+        <div style="display: flex; flex-direction: column; height: 100%; padding: 20px; box-sizing: border-box;">
+          <h1>Task Module Example</h1>
+          <div class="horizontal">
+            <input id="taskInput" type="text" placeholder="Enter some text" />
+            <button id="openTaskModuleButton" style="background-color: green;">Open Task Module</button>
+            </div>
+            </div>
+            `;
+      });
+    </script>
+  </head>
+  <body>
+    <div>
+      <p>Loading...</p>
+    </div>
+  </body>
+</html>
