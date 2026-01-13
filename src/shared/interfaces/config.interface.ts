@@ -1,7 +1,6 @@
 /**
  * Configuration interfaces for the application
  */
-
 import { AuthConfiguration } from "@microsoft/agents-hosting";
 
 export interface IAzureOpenAIConfig {
@@ -66,5 +65,10 @@ export interface IAppConfig {
   basePath: string;
 }
 
-// Configuration loader interface
-export { IConfigLoader } from "./config-loader";
+/**
+ * Abstract base class for configuration loaders
+ */
+export abstract class IConfigLoader {
+  abstract getSource(): string;
+  abstract loadConfiguration(): IAppConfig | Promise<IAppConfig>;
+}

@@ -1,7 +1,6 @@
 import { AuthConfiguration } from "@microsoft/agents-hosting";
 import dotenv from "dotenv";
-import { IAppConfig, IAzureOpenAIConfig, IConfigLoader, IOrchestratorConfig } from "../interfaces";
-import { ILogger } from "../interfaces/services/logger";
+import { IAppConfig, IAzureOpenAIConfig, IConfigLoader, IOrchestratorConfig, ILogger } from "src/shared/interfaces";
 
 export class EnvironmentConfigLoader extends IConfigLoader {
   constructor(private logger: ILogger) {

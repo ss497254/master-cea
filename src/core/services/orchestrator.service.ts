@@ -1,34 +1,17 @@
 import { createAzure, AzureOpenAIProvider } from "@ai-sdk/azure";
 import { generateText } from "ai";
 import { TurnContext, UserState } from "@microsoft/agents-hosting";
-import { IAzureOpenAIConfig, IOrchestratorConfig } from "../../interfaces/config";
-import { IRoutingDecision, ICachedDecision, HandlerType } from "../../interfaces/orchestrator";
-import { ILogger } from "../../interfaces/services/logger";
+import { ORCHESTRATOR_ROUTING_PROMPT } from "src/config/prompts";
+import {
+  IAzureOpenAIConfig,
+  IOrchestratorConfig,
+  IRoutingDecision,
+  ICachedDecision,
+  HandlerType,
+  ILogger,
+} from "src/shared/interfaces";
 
 const ORCHESTRATOR_CACHE_KEY = "orchestratorCache";
-
-const ROUTING_PROMPT = `You are a message router for a Microsoft Teams bot. Classify the user's message and return JSON only.
-
-Available handlers:
-- demo: Help, playground, demos, testing features, simple greetings
-- ai: Open-ended questions, complex reasoning, creative tasks, general knowledge
-- admin: Admin features, privileged operations, settings management
-- echo: Simple echo/repeat requests, mirror messages
-
-Capabilities per handler:
-- demo: help, playground, basic, messaging, sensitivity
-- ai: general-qa, creative, analysis, coding
-- admin: admin, settings, analytics
-- echo: repeat
-
-Rules:
-- If user asks for help or types "help", route to demo/help
-- If user wants to echo/repeat something, route to echo/repeat
-- If user asks questions, wants explanations, or creative content, route to ai/general-qa
-- Default to ai/general-qa if uncertain
-
-Respond with JSON only, no explanation:
-{"handler": "demo|ai|admin|echo", "capability": "string", "confidence": 0.0-1.0}`;
 
 export class OrchestratorService {
   private azure: AzureOpenAIProvider;
@@ -92,7 +75,7 @@ export class OrchestratorService {
   private async classifyMessage(message: string): Promise<IRoutingDecision> {
     const { text } = await generateText({
       model: this.azure(this.orchestratorConfig.deploymentName),
-      system: ROUTING_PROMPT,
+      system: ORCHESTRATOR_ROUTING_PROMPT,
       prompt: message,
       temperature: 0.1,
     });

@@ -1,4 +1,4 @@
-import { ILogger } from "../../interfaces/services/logger";
+import { ILogger } from "src/shared/interfaces";
 
 export class LoggerService implements ILogger {
   private logLevel: string;

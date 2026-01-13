@@ -2,8 +2,7 @@
 import { ActivityTypes } from "@microsoft/agents-activity";
 import { ActivityHandler, AuthConfiguration, TurnContext } from "@microsoft/agents-hosting";
 import { getActivityRoutes } from "src/bot/demo/routes";
-import { BotInvokeRoute, BotMessageRoute } from "src/interfaces/bot/route";
-import { ILogger } from "src/interfaces/services/logger";
+import { BotInvokeRoute, BotMessageRoute, ILogger } from "src/shared/interfaces";
 import { isInvokeActivityForRoute, isMessageActivityForRoute } from "src/utils/helpers";
 
 export class DemoHandler extends ActivityHandler {

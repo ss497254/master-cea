@@ -1,23 +1,14 @@
-import { ActivityHandler } from "@microsoft/agents-hosting";
-import { ILogger } from "src/interfaces/services/logger";
+import { TurnContext } from "@microsoft/agents-hosting";
+import { ILogger } from "src/shared/interfaces";
+import { BaseActivityHandler } from "./base.handler";
 
-export class AdminHandler extends ActivityHandler {
-  constructor(private logger: ILogger) {
-    super();
-    this.onMembersAdded(async (context, next) => {
-      this.logger.debug("Members added", { members: context.activity.membersAdded });
-      const membersAdded = context.activity.membersAdded;
-      for (const member of membersAdded!) {
-        if (member.id !== context.activity.recipient!.id) {
-          await context.sendActivity("Welcome to the Admin bot!");
-        }
-      }
-      await next();
-    });
+export class AdminHandler extends BaseActivityHandler {
+  constructor(logger: ILogger) {
+    super("Admin", logger);
+  }
 
-    this.onMessage(async (context, next) => {
-      await context.sendActivity(`You said: ${context.activity.text}`);
-      await next();
-    });
+  protected async processMessage(context: TurnContext): Promise<void> {
+    // TODO: Implement admin-specific message processing logic here
+    await context.sendActivity(`You said: ${context.activity.text}`);
   }
 }

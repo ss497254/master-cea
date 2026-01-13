@@ -1,7 +1,7 @@
 import express, { Router } from "express";
 import { container } from "tsyringe";
 import { getMessagesRoute } from "./messages";
-import { ConfigurationService, LoggerService } from "../core/services";
+import { ConfigurationService, LoggerService } from "src/core/services";
 
 export function createExpressRouter() {
   const router = Router({ strict: true });

@@ -1,7 +1,7 @@
 import { authorizeJWT, type Request } from "@microsoft/agents-hosting";
 import { json, Router, type Response } from "express";
 import { container } from "tsyringe";
-import { ConfigurationService, LoggerService, MessageProcessorService } from "../core/services";
+import { ConfigurationService, LoggerService, MessageProcessorService } from "src/core/services";
 
 export function getMessagesRoute() {
   const router = Router({ strict: true });

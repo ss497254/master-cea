@@ -1,4 +1,4 @@
-import { ICommandConfig, CommandRequest } from "../../interfaces";
+import { ICommandConfig, CommandRequest } from "src/shared/interfaces";
 
 export class CommandParser {
   constructor(private config: ICommandConfig) {}

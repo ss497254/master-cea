@@ -1,5 +1,5 @@
 import { ActivityTypes } from "@microsoft/agents-activity";
-import { BotMessageRoute } from "src/interfaces/bot/route";
+import { BotMessageRoute } from "src/shared/interfaces";
 import { sendActivity } from "src/utils/helpers";
 
 export const SensitivityRoute: BotMessageRoute = {

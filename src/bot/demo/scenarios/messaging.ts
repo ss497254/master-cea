@@ -1,4 +1,4 @@
-import { BotMessageRoute } from "src/interfaces/bot/route";
+import { BotMessageRoute } from "src/shared/interfaces";
 
 export const NoResponseRoute: BotMessageRoute = {
   keyword: "noresponse",

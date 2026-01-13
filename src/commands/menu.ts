@@ -1,6 +1,6 @@
 import { TurnContext } from "@microsoft/agents-hosting";
-import { Command } from "../core/commands/command";
-import { CommandRequest } from "../interfaces";
+import { Command } from "src/core/commands/command";
+import { CommandRequest } from "src/shared/interfaces";
 
 export class MenuCommand extends Command {
   constructor() {

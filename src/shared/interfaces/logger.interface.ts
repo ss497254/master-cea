@@ -1,7 +1,6 @@
 /**
- * Logging service interfaces
+ * Logger service interface
  */
-
 export interface ILogger {
   debug(message: string, meta?: Record<string, unknown>): void;
   info(message: string, meta?: Record<string, unknown>): void;

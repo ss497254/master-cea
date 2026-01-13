@@ -1,5 +1,5 @@
 import { TurnContext } from "@microsoft/agents-hosting";
-import { CommandRequest } from "../../interfaces";
+import { CommandRequest } from "src/shared/interfaces";
 
 export abstract class Command {
   name: string;

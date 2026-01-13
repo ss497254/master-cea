@@ -1,21 +1,19 @@
-import { TurnContext, UserState } from "@microsoft/agents-hosting";
-import { Command } from "../core/commands/command";
-import { CommandRequest } from "../interfaces";
-import { USER_MODE_STATE_KEY } from "../config/constants";
+import { TurnContext } from "@microsoft/agents-hosting";
+import { Command } from "src/core/commands/command";
+import { IUserPreferencesRepository } from "src/core/repositories";
+import { CommandRequest } from "src/shared/interfaces";
 
 export class GetModeCommand extends Command {
-  constructor(private userState: UserState) {
+  constructor(private userPreferences: IUserPreferencesRepository) {
     super("get-mode", "Get the mode");
   }
 
   canExecute(_request: CommandRequest): boolean | Promise<boolean> {
-    // TODO: add permission check
     return true;
   }
 
-  async execute(request: CommandRequest, context: TurnContext) {
-    const userModeAccessor = this.userState.createProperty<string>(USER_MODE_STATE_KEY);
-    const mode = await userModeAccessor.get(context);
+  async execute(_request: CommandRequest, context: TurnContext) {
+    const mode = await this.userPreferences.getMode(context);
     await context.sendActivity(`Current mode is: ${mode ?? "demo"}`);
   }
 }

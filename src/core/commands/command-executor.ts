@@ -1,5 +1,5 @@
 import { TurnContext } from "@microsoft/agents-hosting";
-import { CommandRequest, ICommandConfig } from "../../interfaces";
+import { CommandRequest, ICommandConfig } from "src/shared/interfaces";
 import { Command, CommandError } from "./command";
 
 export class CommandExecutor {

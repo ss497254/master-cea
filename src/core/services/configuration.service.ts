@@ -1,7 +1,6 @@
 import { AuthConfiguration } from "@microsoft/agents-hosting";
-import { ConfigValidator, EnvironmentConfigLoader } from "../../config";
-import { IAppConfig, IAzureOpenAIConfig, IOrchestratorConfig } from "../../interfaces/config";
-import { ILogger } from "../../interfaces/services/logger";
+import { ConfigValidator, EnvironmentConfigLoader } from "src/config";
+import { IAppConfig, IAzureOpenAIConfig, IOrchestratorConfig, ILogger } from "src/shared/interfaces";
 
 export class ConfigurationService {
   private _config?: IAppConfig;

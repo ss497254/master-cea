@@ -1,6 +1,6 @@
-import { BotMessageRoute } from "src/interfaces/bot/route";
+import { BotMessageRoute } from "src/shared/interfaces";
 import { sendActivity, sendCard } from "src/utils/helpers";
-import { messageBackCard } from "../cards/message-back";
+import { messageBackCard } from "src/bot/demo/cards/message-back";
 
 export const HelloWorldRoutes: BotMessageRoute = {
   keyword: "hello",

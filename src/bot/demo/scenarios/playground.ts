@@ -1,6 +1,6 @@
-import { BotInvokeRoute, BotMessageRoute } from "src/interfaces/bot/route";
+import { BotInvokeRoute, BotMessageRoute } from "src/shared/interfaces";
 import { sendActivity, sendCard } from "src/utils/helpers";
-import { PLAYGROUND_CARD } from "../cards/playground";
+import { PLAYGROUND_CARD } from "src/bot/demo/cards/playground";
 
 export const PlaygroundRoute: BotMessageRoute = {
   keyword: "playground",

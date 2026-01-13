@@ -1,5 +1,5 @@
-import { BotInvokeRoute, BotMessageRoute } from "src/interfaces/bot/route";
-import { sendCard } from "../../utils/helpers";
+import { BotInvokeRoute, BotMessageRoute } from "src/shared/interfaces";
+import { sendCard } from "src/utils/helpers";
 import { getHelpCard } from "./cards/help";
 import * as Routes from "./scenarios";
 

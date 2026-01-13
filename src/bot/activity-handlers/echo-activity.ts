@@ -1,28 +1,21 @@
-import { ActivityHandler } from "@microsoft/agents-hosting";
-import { ILogger } from "src/interfaces/services/logger";
+import { TurnContext } from "@microsoft/agents-hosting";
+import { ILogger } from "src/shared/interfaces";
+import { BaseActivityHandler } from "./base.handler";
 
-export class EchoActivityHandler extends ActivityHandler {
-  constructor(private logger: ILogger) {
-    super();
-    this.onMembersAdded(async (context, next) => {
-      this.logger.debug("Members added", { members: context.activity.membersAdded });
-      const membersAdded = context.activity.membersAdded;
-      for (const member of membersAdded!) {
-        if (member.id !== context.activity.recipient!.id) {
-          await context.sendActivity("Welcome to the Echo Activity bot!");
-        }
-      }
-      await next();
-    });
+export class EchoActivityHandler extends BaseActivityHandler {
+  constructor(logger: ILogger) {
+    super("Echo Activity", logger);
+    this.setupInvokeHandler();
+  }
 
-    this.onMessage(async (context, next) => {
-      await context.sendActivity(`\
+  protected async processMessage(context: TurnContext): Promise<void> {
+    await context.sendActivity(`\
 \`\`\`json
 ${JSON.stringify(context.activity, null, 2)}
 \`\`\``);
-      await next();
-    });
+  }
 
+  private setupInvokeHandler(): void {
     this.onInvokeActivity = async context => {
       await context.sendActivity(`\
 \`\`\`json
