@@ -161,7 +161,7 @@ ENABLE_CONSOLE_LOGGING=true
 
 # Commands
 ENABLE_COMMANDS=true
-COMMAND_PREFIX=-
+COMMAND_PREFIX=$
 
 # Storage (choose one)
 STORAGE_TYPE=memory  # Options: memory, file, blob, cosmosdb
@@ -219,7 +219,7 @@ bun run debug
 #### Commands
 
 - `ENABLE_COMMANDS`: Enable command system (default: `false`)
-- `COMMAND_PREFIX`: Command prefix character (default: `-`)
+- `COMMAND_PREFIX`: Command prefix character (default: `$`)
 
 #### Storage
 
@@ -347,14 +347,14 @@ export class MyCommand extends Command {
 ```
 
 2. Register it in `src/commands/index.ts`
-3. The command will be available as `-mycommand` (or your configured prefix)
+3. The command will be available as `$mycommand` (or your configured prefix)
 
 ## Key Concepts
 
 ### Activity Handlers
 
 Activity handlers extend `ActivityHandler` from `@microsoft/agents-hosting` and respond to bot activities:
-
+  
 - `onMessage`: Handles text messages
 - `onMembersAdded`: Handles when members join
 - `onMessageReaction`: Handles message reactions
@@ -362,10 +362,10 @@ Activity handlers extend `ActivityHandler` from `@microsoft/agents-hosting` and 
 
 ### Command System
 
-Commands are executed when users type messages starting with the command prefix (default: `-`). Commands support:
+Commands are executed when users type messages starting with the command prefix (default: `$`). Commands support:
 
-- **Named arguments**: `-command --arg value`
-- **Positional arguments**: `-command value1 value2`
+- **Named arguments**: `$command --arg value`
+- **Positional arguments**: `$command value1 value2`
 - **Required/optional arguments**
 - **Permission checks** via `canExecute()`
 
@@ -496,8 +496,8 @@ Upload this package to Teams to install the bot.
 
 ## License
 
-[Add your license information here]
+Why do you need a license?. Do whatever you want.
 
 ## Author
 
-Saurabh Singh
+Your Boss.

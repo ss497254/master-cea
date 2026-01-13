@@ -81,7 +81,7 @@ export class EnvironmentConfigLoader extends IConfigLoader {
   private loadCommandConfig() {
     return {
       enableCommands: process.env.ENABLE_COMMANDS === "true",
-      prefix: process.env.COMMAND_PREFIX || "-",
+      prefix: process.env.COMMAND_PREFIX || "$",
     };
   }
 
