@@ -1,10 +1,11 @@
-import "reflect-metadata";
-import { container } from "tsyringe";
-import type { Server } from "http";
 import express from "express";
-import { ConfigurationService, LoggerService } from "./core/services";
-import { registerServices } from "./core/bootstrap/services";
-import { createExpressRouter } from "./routes";
+import type { Server } from "http";
+import "reflect-metadata";
+import { registerServices } from "src/bootstrap";
+import { ConfigurationService } from "src/infrastructure/config";
+import { createExpressRouter } from "src/infrastructure/http";
+import { LoggerService } from "src/infrastructure/logging";
+import { container } from "tsyringe";
 
 async function startApplication(): Promise<void> {
   try {
