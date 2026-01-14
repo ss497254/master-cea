@@ -23,7 +23,7 @@ export function createExpressRouter() {
   router.use("/assets", express.static(config.getAssetsDir()));
 
   // 404 handler - must be after all routes
-  router.get("*", (_req, res) => {
+  router.get("", (_req, res) => {
     res.status(404).send("Not Found");
   });
 

@@ -218,6 +218,7 @@ bun run lint:fix     # ESLint with auto-fix
 ## Layer Dependencies
 
 Follow Clean Architecture dependency rules:
+
 - `application/` → can import from `domain/`, `infrastructure/`, `bot/`, `shared/`
 - `domain/` → can import from `shared/` only (no infrastructure dependencies)
 - `infrastructure/` → can import from `shared/` only
