@@ -1,14 +1,14 @@
-import { createToolRegistry } from "src/infrastructure/tools";
+import { AzureAIService } from "src/infrastructure/ai";
 import { IConfigurationService, ILogger } from "src/shared/interfaces";
 import { ChatHandler } from "./chat.handler";
+import { chatTools } from "./tools";
 
 export function createChatHandler(config: IConfigurationService, logger: ILogger): ChatHandler {
-  // Create tool registry
   const toolsConfig = config.getToolsConfig();
-  const toolRegistry = createToolRegistry(toolsConfig, logger);
+  const tools = toolsConfig.enableBuiltinTools ? chatTools : {};
+  const aiService = new AzureAIService(config.getAzureOpenAIConfig());
 
-  // Create chat handler with tools
-  return new ChatHandler(config.getAzureOpenAIConfig(), toolsConfig, toolRegistry, logger);
+  return new ChatHandler(aiService, toolsConfig, tools, logger);
 }
 
 export { ChatHandler } from "./chat.handler";
