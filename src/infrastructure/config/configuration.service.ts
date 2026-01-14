@@ -5,7 +5,6 @@ import type {
   IAzureOpenAIConfig,
   IConfigurationService,
   ILogger,
-  IOrchestratorConfig,
   IToolsConfig,
 } from "src/shared/interfaces";
 
@@ -48,10 +47,6 @@ export class ConfigurationService implements IConfigurationService {
 
   public getAzureOpenAIConfig(): IAzureOpenAIConfig {
     return this.config.azureOpenAI;
-  }
-
-  public getOrchestratorConfig(): IOrchestratorConfig {
-    return this.config.orchestrator;
   }
 
   public getCommandConfig() {

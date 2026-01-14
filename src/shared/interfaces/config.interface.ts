@@ -25,32 +25,26 @@ export interface ICommandConfig {
 
 export type StorageConfig =
   | {
-      type: "memory";
-    }
+    type: "memory";
+  }
   | {
-      type: "file";
-      filePath: string;
-    }
+    type: "file";
+    filePath: string;
+  }
   | {
-      type: "blob";
-      containerId: string;
-      connectionString: string;
-    }
+    type: "blob";
+    containerId: string;
+    connectionString: string;
+  }
   | {
-      type: "cosmosdb";
-      databaseId: string;
-      containerId: string;
-      cosmosClientOptions: {
-        endpoint: string;
-        key: string;
-      };
+    type: "cosmosdb";
+    databaseId: string;
+    containerId: string;
+    cosmosClientOptions: {
+      endpoint: string;
+      key: string;
     };
-
-export interface IOrchestratorConfig {
-  enabled: boolean;
-  deploymentName: string;
-  cacheTTL: number; // seconds
-}
+  };
 
 export interface IToolsConfig {
   /** Enable built-in tools (math solver, etc.) */
@@ -62,7 +56,6 @@ export interface IToolsConfig {
 export interface IAppConfig {
   bot: AuthConfiguration;
   azureOpenAI: IAzureOpenAIConfig;
-  orchestrator: IOrchestratorConfig;
   logging: ILoggingConfig;
   storage: StorageConfig;
   commands: ICommandConfig;
@@ -86,7 +79,6 @@ export interface IConfigurationService {
   getConfig(): IAppConfig;
   getBotConfig(): AuthConfiguration;
   getAzureOpenAIConfig(): IAzureOpenAIConfig;
-  getOrchestratorConfig(): IOrchestratorConfig;
   getCommandConfig(): ICommandConfig;
   getStorageConfig(): StorageConfig;
   getToolsConfig(): IToolsConfig;

@@ -5,7 +5,6 @@ import type {
   IAzureOpenAIConfig,
   IConfigLoader,
   ILogger,
-  IOrchestratorConfig,
   IToolsConfig,
 } from "src/shared/interfaces";
 
@@ -26,7 +25,6 @@ export class EnvironmentConfigLoader implements IConfigLoader {
 
     return {
       azureOpenAI: this.loadAzureOpenAIConfig(),
-      orchestrator: this.loadOrchestratorConfig(),
       bot: this.loadBotConfig(),
       commands: this.loadCommandConfig(),
       storage: this.loadStorageConfig(),
@@ -67,14 +65,6 @@ export class EnvironmentConfigLoader implements IConfigLoader {
       apiVersion: process.env.AZURE_OPENAI_API_VERSION || "2024-12-01-preview",
       maxTokens: parseInt(process.env.AZURE_OPENAI_MAX_TOKENS || "2000", 10),
       temperature: parseFloat(process.env.AZURE_OPENAI_TEMPERATURE || "0.7"),
-    };
-  }
-
-  private loadOrchestratorConfig(): IOrchestratorConfig {
-    return {
-      enabled: process.env.ORCHESTRATOR_ENABLED === "true",
-      deploymentName: process.env.ORCHESTRATOR_DEPLOYMENT_NAME || "gpt-4o-mini",
-      cacheTTL: parseInt(process.env.ORCHESTRATOR_CACHE_TTL || "3600", 10),
     };
   }
 
