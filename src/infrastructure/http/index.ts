@@ -3,11 +3,12 @@ import { ConfigurationService } from "src/infrastructure/config";
 import { LoggerService } from "src/infrastructure/logging";
 import { container } from "tsyringe";
 import { getMessagesRoute } from "./routes";
+import type { IConfigurationService, ILogger } from "src/shared/interfaces";
 
 export function createExpressRouter() {
   const router = Router({ strict: true });
-  const config = container.resolve<ConfigurationService>(ConfigurationService);
-  const logger = container.resolve<LoggerService>(LoggerService);
+  const config = container.resolve<IConfigurationService>(ConfigurationService);
+  const logger = container.resolve<ILogger>(LoggerService);
   const environment = config.getConfig().environment;
 
   router.get("/", (_req, res) => {

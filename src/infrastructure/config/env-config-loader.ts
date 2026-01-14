@@ -1,10 +1,16 @@
 import { AuthConfiguration } from "@microsoft/agents-hosting";
 import dotenv from "dotenv";
-import { IAppConfig, IAzureOpenAIConfig, IConfigLoader, ILogger, IOrchestratorConfig } from "src/shared/interfaces";
+import type {
+  IAppConfig,
+  IAzureOpenAIConfig,
+  IConfigLoader,
+  ILogger,
+  IOrchestratorConfig,
+  IToolsConfig,
+} from "src/shared/interfaces";
 
-export class EnvironmentConfigLoader extends IConfigLoader {
+export class EnvironmentConfigLoader implements IConfigLoader {
   constructor(private logger: ILogger) {
-    super();
     if (this.getEnvironment() !== "production") {
       dotenv.config(); // Load .env file in non-production environments
       this.logger.debug("Environment variables loaded by dotenv");
@@ -25,6 +31,7 @@ export class EnvironmentConfigLoader extends IConfigLoader {
       commands: this.loadCommandConfig(),
       storage: this.loadStorageConfig(),
       logging: this.loadLoggingConfig(),
+      tools: this.loadToolsConfig(),
       environment: this.getEnvironment(),
       port: this.getPort(),
       assetsDir: process.env.ASSETS_DIR || "assets",
@@ -115,6 +122,13 @@ export class EnvironmentConfigLoader extends IConfigLoader {
         this.logger.warn(`Unknown STORAGE_TYPE "${type}", defaulting to memory storage.`);
         return { type: "memory" } as const;
     }
+  }
+
+  private loadToolsConfig(): IToolsConfig {
+    return {
+      enableBuiltinTools: process.env.TOOLS_ENABLED !== "false",
+      maxToolSteps: parseInt(process.env.TOOLS_MAX_STEPS || "5", 10),
+    };
   }
 
   private getPort(): number {

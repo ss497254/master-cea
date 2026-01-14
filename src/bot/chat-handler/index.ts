@@ -1,9 +1,8 @@
-import { ConfigurationService } from "src/infrastructure/config";
 import { createToolRegistry } from "src/infrastructure/tools";
-import { ILogger } from "src/shared/interfaces";
+import { IConfigurationService, ILogger } from "src/shared/interfaces";
 import { ChatHandler } from "./chat.handler";
 
-export function createChatHandler(config: ConfigurationService, logger: ILogger): ChatHandler {
+export function createChatHandler(config: IConfigurationService, logger: ILogger): ChatHandler {
   // Create tool registry
   const toolsConfig = config.getToolsConfig();
   const toolRegistry = createToolRegistry(toolsConfig, logger);

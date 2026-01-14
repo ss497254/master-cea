@@ -52,6 +52,13 @@ export interface IOrchestratorConfig {
   cacheTTL: number; // seconds
 }
 
+export interface IToolsConfig {
+  /** Enable built-in tools (math solver, etc.) */
+  enableBuiltinTools: boolean;
+  /** Maximum tool execution steps for agentic loops */
+  maxToolSteps: number;
+}
+
 export interface IAppConfig {
   bot: AuthConfiguration;
   azureOpenAI: IAzureOpenAIConfig;
@@ -59,6 +66,7 @@ export interface IAppConfig {
   logging: ILoggingConfig;
   storage: StorageConfig;
   commands: ICommandConfig;
+  tools: IToolsConfig;
   environment: "development" | "production" | "staging";
   port: number;
   assetsDir: string;
@@ -68,7 +76,26 @@ export interface IAppConfig {
 /**
  * Abstract base class for configuration loaders
  */
-export abstract class IConfigLoader {
-  abstract getSource(): string;
-  abstract loadConfiguration(): IAppConfig | Promise<IAppConfig>;
+export interface IConfigLoader {
+  getSource(): string;
+  loadConfiguration(): IAppConfig | Promise<IAppConfig>;
+}
+
+export interface IConfigurationService {
+  load(): Promise<void>;
+  getConfig(): IAppConfig;
+  getBotConfig(): AuthConfiguration;
+  getAzureOpenAIConfig(): IAzureOpenAIConfig;
+  getOrchestratorConfig(): IOrchestratorConfig;
+  getCommandConfig(): ICommandConfig;
+  getStorageConfig(): StorageConfig;
+  getToolsConfig(): IToolsConfig;
+  isConfigLoaded(): boolean;
+  isProduction(): boolean;
+  isDevelopment(): boolean;
+  getPort(): number;
+  getLogLevel(): string;
+  isConsoleLoggingEnabled(): boolean;
+  getAssetsDir(): string;
+  getBasePath(): string;
 }

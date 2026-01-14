@@ -1,6 +1,5 @@
 import { ActivityHandler } from "@microsoft/agents-hosting";
-import { ConfigurationService } from "src/infrastructure/config";
-import { ILogger } from "src/shared/interfaces";
+import { IConfigurationService, ILogger } from "src/shared/interfaces";
 import { AdminHandler } from "./admin.handler";
 import { DemoHandler } from "./demo.handler";
 import { EchoHandler } from "./echo.handler";
@@ -10,13 +9,13 @@ import { EchoActivityHandler } from "./raw-activity.handler";
 export type HandlerName = "echo" | "raw-activity" | "demo" | "admin";
 
 export function getActivityHandlers(
-  config: ConfigurationService,
+  config: IConfigurationService,
   logger: ILogger
 ): Record<HandlerName, ActivityHandler> {
   return {
     echo: new EchoHandler(logger),
-    "raw-activity": new EchoActivityHandler(logger),
     demo: new DemoHandler(config.getBotConfig(), logger),
     admin: new AdminHandler(logger),
+    "raw-activity": new EchoActivityHandler(logger),
   };
 }

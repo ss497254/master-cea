@@ -1,8 +1,15 @@
 import { AuthConfiguration } from "@microsoft/agents-hosting";
 import { ConfigValidator, EnvironmentConfigLoader } from "src/infrastructure/config";
-import { IAppConfig, IAzureOpenAIConfig, IOrchestratorConfig, ILogger } from "src/shared/interfaces";
+import type {
+  IAppConfig,
+  IAzureOpenAIConfig,
+  IConfigurationService,
+  ILogger,
+  IOrchestratorConfig,
+  IToolsConfig,
+} from "src/shared/interfaces";
 
-export class ConfigurationService {
+export class ConfigurationService implements IConfigurationService {
   private _config?: IAppConfig;
   private logger: ILogger;
   private validator: ConfigValidator;
@@ -53,6 +60,10 @@ export class ConfigurationService {
 
   public getStorageConfig() {
     return this.config.storage;
+  }
+
+  public getToolsConfig(): IToolsConfig {
+    return this.config.tools;
   }
 
   public isConfigLoaded(): boolean {
