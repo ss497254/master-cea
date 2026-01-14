@@ -3,7 +3,7 @@ import { Command } from "src/domain/commands/command";
 import { CommandRequest } from "src/shared/interfaces";
 
 export class ListModeCommand extends Command {
-  constructor(private modes: string[] = []) {
+  constructor(private getModes: () => string[] = () => []) {
     super("list-mode", "List available modes");
   }
 
@@ -12,6 +12,6 @@ export class ListModeCommand extends Command {
   }
 
   async execute(_request: CommandRequest, context: TurnContext) {
-    await context.sendActivity(`Mode: ${this.modes.join(", ")}`);
+    await context.sendActivity(`Mode: ${this.getModes().join(", ")}`);
   }
 }
