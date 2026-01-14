@@ -4,10 +4,10 @@ import { USER_MODE_STATE_KEY } from "src/infrastructure/config/constants";
 /**
  * Interface for user preferences repository
  */
-export interface IUserPreferencesRepository {
-  getMode(context: TurnContext): Promise<string | undefined>;
-  setMode(context: TurnContext, mode: string): Promise<void>;
-  clearMode(context: TurnContext): Promise<void>;
+export abstract class IUserPreferencesRepository {
+  abstract getMode(context: TurnContext): Promise<string | undefined>;
+  abstract setMode(context: TurnContext, mode: string): Promise<void>;
+  abstract clearMode(context: TurnContext): Promise<void>;
 }
 
 /**
