@@ -1,14 +1,18 @@
 import { AzureOpenAIProvider, createAzure } from "@ai-sdk/azure";
+import { ActivityTypes } from "@microsoft/agents-activity";
 import { ActivityHandler, TurnContext } from "@microsoft/agents-hosting";
-import { streamText } from "ai";
+import { stepCountIs, streamText } from "ai";
 import { AI_SYSTEM_PROMPT } from "src/infrastructure/config/prompts";
-import { IAzureOpenAIConfig, ILogger } from "src/shared/interfaces";
+import { IToolRegistry } from "src/infrastructure/tools/registry/tool-registry.interface";
+import { IAzureOpenAIConfig, ILogger, IToolsConfig } from "src/shared/interfaces";
 
-export class AIHandler extends ActivityHandler {
+export class ChatHandler extends ActivityHandler {
   private readonly azure: AzureOpenAIProvider;
 
   constructor(
     private config: IAzureOpenAIConfig,
+    private toolsConfig: IToolsConfig,
+    private toolRegistry: IToolRegistry,
     private logger: ILogger
   ) {
     super();
@@ -17,13 +21,12 @@ export class AIHandler extends ActivityHandler {
       apiVersion: config.apiVersion,
       baseURL: config.endpoint,
     });
+
     this.onMembersAdded(async (context, next) => {
       const membersAdded = context.activity.membersAdded;
       for (const member of membersAdded!) {
         if (member.id !== context.activity.recipient!.id) {
-          await context.sendActivity(
-            "Hello! I'm your AI assistant. Feel free to ask me anything - questions, help with tasks, creative writing, or just have a conversation!"
-          );
+          await this.sendWelcomeMessage(context);
         }
       }
       await next();
@@ -33,6 +36,18 @@ export class AIHandler extends ActivityHandler {
       await this.handleMessage(context);
       await next();
     });
+  }
+
+  protected async onTurnActivity(context: TurnContext) {
+    switch (context.activity.type) {
+      case ActivityTypes.Message:
+        await this.handleMessage(context);
+        break;
+      case ActivityTypes.Invoke: {
+        await this.handleInvoke(context);
+        break;
+      }
+    }
   }
 
   private async handleMessage(context: TurnContext) {
@@ -53,10 +68,16 @@ export class AIHandler extends ActivityHandler {
       return;
     }
 
+    // Get tools from registry
+    const tools = this.toolRegistry.getTools();
+    const hasTools = Object.keys(tools).length > 0;
+
     const { fullStream } = streamText({
       model: this.azure(this.config.deploymentName),
       system: AI_SYSTEM_PROMPT,
       prompt: message,
+      tools: hasTools ? tools : undefined,
+      stopWhen: hasTools ? stepCountIs(this.toolsConfig.maxToolSteps) : undefined,
     });
 
     try {
@@ -68,10 +89,25 @@ export class AIHandler extends ActivityHandler {
             }
             break;
           }
+          case "tool-call": {
+            // Notify user that a tool is being used
+            context.streamingResponse.queueInformativeUpdate(`Using ${part.toolName}...`);
+            this.logger.debug("Tool call initiated", {
+              tool: part.toolName,
+              callId: part.toolCallId,
+            });
+            break;
+          }
+          case "tool-result": {
+            this.logger.debug("Tool result received", {
+              tool: part.toolName,
+              callId: part.toolCallId,
+            });
+            break;
+          }
           case "error": {
             const error = part.error;
             throw new Error(`Error in streaming: ${error}`);
-            break;
           }
         }
       }
@@ -85,5 +121,16 @@ export class AIHandler extends ActivityHandler {
       await context.streamingResponse.endStream();
       this.logger.info("AI streaming completed");
     }
+  }
+
+  private async handleInvoke(context: TurnContext) {
+    // Placeholder for handling invoke activities if needed in the future
+    this.logger.info("Received invoke activity", { activity: context.activity });
+  }
+
+  private async sendWelcomeMessage(context: TurnContext) {
+    await context.sendActivity(
+      "Hello! I'm your AI assistant. Feel free to ask me anything - questions, help with tasks, creative writing, or just have a conversation!"
+    );
   }
 }
